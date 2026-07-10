@@ -279,6 +279,34 @@
 	background: #c0392b;
 }
 
+.btn-pdf {
+	padding: 8px 16px;
+	background: transparent;
+	color: #e74c3c;
+	border: 2px solid #e74c3c;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 14px;
+	transition: all 0.3s ease;
+	flex: 1;
+	min-width: 100px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+}
+
+.btn-pdf:hover:not(:disabled) {
+	background: #e74c3c;
+	color: white;
+}
+
+.btn-pdf:disabled {
+	border-color: #bdc3c7;
+	color: #bdc3c7;
+	cursor: not-allowed;
+}
+
 /* Modal Styles */
 .modal-overlay {
 	position: fixed;

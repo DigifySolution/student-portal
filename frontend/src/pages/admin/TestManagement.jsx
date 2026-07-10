@@ -7,6 +7,7 @@ import {
 	FaEdit,
 	FaEye,
 	FaFileExport,
+	FaFilePdf,
 	FaImage,
 	FaPercent,
 	FaRedo,
@@ -101,6 +102,7 @@ const TestManagement = () => {
 	const [showImageModal, setShowImageModal] = useState(false);
 	const [currentTest, setCurrentTest] = useState(null);
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
+	const [pdfProgress, setPdfProgress] = useState(null);
 
 	useEffect(() => {
 		fetchTests();
@@ -259,6 +261,96 @@ const TestManagement = () => {
 	const viewSubmissions = (test) => {
 		setSelectedTest(test);
 		fetchSubmissions(test.id);
+	};
+
+	const loadImageAsBase64 = (url) => {
+		return new Promise((resolve, reject) => {
+			const img = new Image();
+			img.crossOrigin = "anonymous";
+			const cacheBusterUrl = `${url}${url.includes("?") ? "&" : "?"}_t=${Date.now()}`;
+			img.onload = () => {
+				const canvas = document.createElement("canvas");
+				canvas.width = img.naturalWidth;
+				canvas.height = img.naturalHeight;
+				const ctx = canvas.getContext("2d");
+				if (!ctx) {
+					reject(new Error("Failed to get 2D context"));
+					return;
+				}
+				ctx.drawImage(img, 0, 0);
+				try {
+					const dataURL = canvas.toDataURL("image/jpeg", 0.9);
+					resolve({ dataURL, width: img.naturalWidth, height: img.naturalHeight });
+				} catch (err) {
+					reject(err);
+				}
+			};
+			img.onerror = () => reject(new Error(`Failed to load image: ${url}`));
+			img.src = cacheBusterUrl;
+		});
+	};
+
+	const downloadTestAsPDF = async (test) => {
+		if (!test.images || test.images.length === 0) {
+			alert("لا توجد صور في هذا الاختبار");
+			return;
+		}
+
+		setPdfProgress({
+			testId: test.id,
+			current: 0,
+			total: test.images.length,
+		});
+
+		try {
+			const API_BASE =
+				import.meta.env.VITE_STATIC_BASE_URL ||
+				"https://studentportal.8bitsolutions.net";
+
+			const sortedImages = [...test.images].sort(
+				(a, b) => (a.display_order || 0) - (b.display_order || 0),
+			);
+
+			const loadedImages = [];
+			for (let i = 0; i < sortedImages.length; i++) {
+				const img = sortedImages[i];
+				const imagePath = img.image_path.replace(/\\/g, "/").replace(/^\//, "");
+				const imageUrl = `${API_BASE}/${imagePath}`;
+
+				setPdfProgress((prev) => (prev ? { ...prev, current: i + 1 } : null));
+				const imgData = await loadImageAsBase64(imageUrl);
+				loadedImages.push(imgData);
+			}
+
+			// Dynamically import jsPDF
+			const { jsPDF } = await import("jspdf");
+
+			// Create PDF with dimensions of first page
+			const doc = new jsPDF({
+				orientation:
+					loadedImages[0].width > loadedImages[0].height
+						? "landscape"
+						: "portrait",
+				unit: "px",
+				format: [loadedImages[0].width, loadedImages[0].height],
+			});
+
+			// Add each page
+			for (let i = 0; i < loadedImages.length; i++) {
+				const img = loadedImages[i];
+				if (i > 0) {
+					doc.addPage([img.width, img.height], img.width > img.height ? "l" : "p");
+				}
+				doc.addImage(img.dataURL, "JPEG", 0, 0, img.width, img.height);
+			}
+
+			doc.save(`${test.title}.pdf`);
+		} catch (error) {
+			console.error("Error generating PDF:", error);
+			alert("حدث خطأ أثناء إنشاء ملف الـ PDF. يرجى المحاولة مرة أخرى.");
+		} finally {
+			setPdfProgress(null);
+		}
 	};
 
 	if (loading) {
@@ -420,6 +512,24 @@ const TestManagement = () => {
 								>
 									عرض المشاركات
 								</button>
+								{test.images && test.images.length > 0 && (
+									<button
+										className="btn-pdf"
+										onClick={() => downloadTestAsPDF(test)}
+										disabled={pdfProgress !== null}
+									>
+										{pdfProgress && pdfProgress.testId === test.id ? (
+											<span>
+												جاري التحميل ({pdfProgress.current}/{pdfProgress.total})
+											</span>
+										) : (
+											<>
+												<FaFilePdf style={{ marginInlineEnd: 4 }} />
+												<span>تحميل PDF</span>
+											</>
+										)}
+									</button>
+								)}
 								<button
 									className="btn-secondary"
 									onClick={() => setEditingTest(test)}
