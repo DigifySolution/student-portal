@@ -13,7 +13,10 @@ import AdminLogin from "./pages/AdminLogin";
 import DashboardHomePage from "./pages/admin/DashboardHomePage";
 import StudentManagement from "./pages/admin/StudentManagement";
 import TestManagement from "./pages/admin/TestManagement";
+import CurriculumManagement from "./pages/admin/CurriculumManagement";
 import Home from "./pages/Home";
+import CurriculumPage from "./pages/CurriculumPage";
+import LecturePlayerPage from "./pages/LecturePlayerPage";
 import StudentAutoLogin from "./pages/StudentAutoLogin";
 import StudentDashboard from "./pages/StudentDashboard";
 import StudentLogin from "./pages/StudentLogin";
@@ -21,7 +24,7 @@ import TestResult from "./pages/TestResult";
 import TestTaking from "./pages/TestTaking";
 import "./App.css";
 
-// Protected Route  Component
+// Protected Route Component
 const ProtectedRoute = ({ children, allowedTypes }) => {
 	const { user, loading } = useAuth();
 	const [searchParams] = useSearchParams();
@@ -58,6 +61,8 @@ const AppContent = () => {
 				<main className="main-content">
 					<Routes>
 						<Route path="/" element={<Home />} />
+						<Route path="/curriculum" element={<CurriculumPage />} />
+						<Route path="/lectures" element={<LecturePlayerPage />} />
 						<Route path="/student/login" element={<StudentLogin />} />
 						<Route path="/student/auto-login" element={<StudentAutoLogin />} />
 						<Route path="/admin/login" element={<AdminLogin />} />
@@ -94,6 +99,7 @@ const AppContent = () => {
 							}
 						>
 							<Route index element={<DashboardHomePage />} />
+							<Route path="curriculum" element={<CurriculumManagement />} />
 							<Route path="students" element={<StudentManagement />} />
 							<Route path="tests" element={<TestManagement />} />
 						</Route>

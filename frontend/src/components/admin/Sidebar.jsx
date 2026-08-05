@@ -19,6 +19,17 @@ const Sidebar = () => {
 					<span className="label">اللوحة الرئيسية</span>
 				</NavLink>
 				<NavLink
+					to="/admin/dashboard/curriculum"
+					className={({ isActive }) =>
+						isActive ? "sidebar-link active" : "sidebar-link"
+					}
+				>
+					<span className="icon" aria-hidden>
+						📚
+					</span>
+					<span className="label">إدارة المنهج والدروس</span>
+				</NavLink>
+				<NavLink
 					to="/admin/dashboard/students"
 					className={({ isActive }) =>
 						isActive ? "sidebar-link active" : "sidebar-link"

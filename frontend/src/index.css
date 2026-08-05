@@ -1,78 +1,107 @@
-/* Reset and Base Styles with RTL Support */
-* {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-primary: #006d35;
+    --color-primary-container: #00e676;
+    --color-primary-fixed: #62ff96;
+    --color-primary-fixed-dim: #00e475;
+    --color-on-primary: #ffffff;
+    --color-on-primary-container: #00612e;
+    
+    --color-secondary: #825500;
+    --color-secondary-container: #feaa00;
+    --color-secondary-fixed: #ffddb3;
+    --color-secondary-fixed-dim: #ffb950;
+    --color-on-secondary: #ffffff;
+    --color-on-secondary-container: #684300;
+
+    --color-tertiary: #b02f00;
+    --color-tertiary-container: #ffb7a3;
+    --color-tertiary-fixed: #ffdbd1;
+    --color-tertiary-fixed-dim: #ffb5a0;
+    --color-on-tertiary: #ffffff;
+    --color-on-tertiary-container: #9d2900;
+
+    --color-background: #e8ffee;
+    --color-surface: #e8ffee;
+    --color-surface-dim: #c7e0ce;
+    --color-surface-variant: #d0e9d6;
+    --color-surface-container: #dbf4e2;
+    --color-surface-container-low: #e1fae7;
+    --color-surface-container-high: #d5eedc;
+    --color-surface-container-highest: #d0e9d6;
+    --color-surface-container-lowest: #ffffff;
+    
+    --color-on-background: #0a2014;
+    --color-on-surface: #0a2014;
+    --color-on-surface-variant: #3b4a3d;
+    --color-outline: #6b7b6c;
+    --color-outline-variant: #bacbb9;
+  }
+
+  body {
+    font-family: 'IBM Plex Sans Arabic', system-ui, -apple-system, sans-serif;
+    background-color: var(--color-background);
+    color: var(--color-on-background);
+    direction: rtl;
+    text-align: right;
+  }
 }
 
-html {
-	direction: rtl;
+/* Glassmorphic card styling matching the HTML snippet */
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 10px 30px rgba(0, 109, 53, 0.08);
 }
 
-body {
-	font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-	line-height: 1.6;
-	color: #1e293b;
-	background-color: #f8fafc;
-	direction: rtl;
-	text-align: right;
+.text-gradient {
+  background: linear-gradient(135deg, #00e676, #006d35);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-#root {
-	min-height: 100vh;
-	display: flex;
-	flex-direction: column;
+.hero-bg {
+  background: radial-gradient(circle at 50% 50%, rgba(98, 255, 150, 0.18) 0%, rgba(232, 255, 238, 1) 100%);
 }
 
-/* Ensure RTL for all elements */
-* {
-	direction: inherit;
+.pattern-bg {
+  background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD0fSRKp04oKcJaRXcCxuvoIRxCc330FRVoEtQoGjS3WoxqXUOJrxySE519MbyIPoeBtEoGmnSsOsZSMFtFTUnU0wkc1iAsz44RTtVrk9bRz0QWgNub6RQFWpG7MXQ3JSXHnkdNXxCrffswoSGa43lvBtmyxrqmEKj-fFu9PWC9STS5ampdc0vkm8E0h7ddgnzZ3jrMllYn4PGlPn2wx7cUHx2HTyrCCTaXqkwYWKFKoao4YNX5x2IO');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.08;
 }
 
-/* RTL specific adjustments */
-input[type="tel"],
-input[type="password"] {
-	direction: ltr;
-	text-align: left;
+/* Material Symbols Outlined settings */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Smooth scrolling */
-html {
-	scroll-behavior: smooth;
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
 }
-
-/* Focus styles for accessibility */
-*:focus {
-	outline: 2px solid #3b82f6;
-	outline-offset: 2px;
+::-webkit-scrollbar-track {
+  background: #e8ffee;
 }
-
-/* Remove default button styles */
-button {
-	font-family: inherit;
+::-webkit-scrollbar-thumb {
+  background: #62ff96;
+  border-radius: 4px;
 }
-
-/* Remove default list styles */
-ul,
-ol {
-	list-style: none;
-}
-
-/* Remove default link styles */
-a {
-	text-decoration: none;
-	color: inherit;
-}
-
-/* Enhanced responsive support */
-@media (max-width: 768px) {
-	body {
-		font-size: 14px;
-	}
-}
-
-@media (max-width: 480px) {
-	body {
-		font-size: 13px;
-	}
+::-webkit-scrollbar-thumb:hover {
+  background: #006d35;
 }
