@@ -7,7 +7,6 @@ const NAV_LINKS = [
 	{ label: "الرئيسية", path: "/" },
 	{ label: "المميزات", path: "/#features" },
 	{ label: "المنهج", path: "/curriculum" },
-	{ label: "المحاضرات", path: "/lectures" },
 ];
 
 export default function Navbar() {
@@ -15,6 +14,7 @@ export default function Navbar() {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const [mobileOpen, setMobileOpen] = useState(false);
+	const [accountOpen, setAccountOpen] = useState(false);
 	const isStudent = user?.type === "student";
 
 	useEffect(() => {
@@ -33,6 +33,7 @@ export default function Navbar() {
 
 	const go = (path) => {
 		setMobileOpen(false);
+		setAccountOpen(false);
 		if (!path.includes("#")) return navigate(path);
 		const hash = path.split("#")[1];
 		if (location.pathname !== "/") {
@@ -50,6 +51,7 @@ export default function Navbar() {
 	const handleLogout = () => {
 		logout();
 		setMobileOpen(false);
+		setAccountOpen(false);
 		navigate("/");
 	};
 
@@ -78,26 +80,42 @@ export default function Navbar() {
 					</nav>
 					<div className="site-header__actions">
 						{isStudent ? (
-							<Link className="site-header__primary" to="/student/dashboard">
-								<span className="material-symbols-outlined">
-									space_dashboard
-								</span>
-								لوحة الطالب
-							</Link>
+							<div className="site-account">
+								<button
+									aria-expanded={accountOpen}
+									className="site-account__trigger"
+									onClick={() => setAccountOpen((open) => !open)}
+									type="button"
+								>
+									<span>{user.name || "الطالب"}</span>
+									<span className="material-symbols-outlined">expand_more</span>
+								</button>
+								{accountOpen ? (
+									<div className="site-account__menu">
+										<Link
+											onClick={() => setAccountOpen(false)}
+											to="/student/dashboard"
+										>
+											<span className="material-symbols-outlined">person</span>
+											الملف الشخصي
+										</Link>
+										<Link onClick={() => setAccountOpen(false)} to="/lectures">
+											<span className="material-symbols-outlined">
+												play_circle
+											</span>
+											المحاضرات
+										</Link>
+										<button onClick={handleLogout} type="button">
+											<span className="material-symbols-outlined">logout</span>
+											تسجيل الخروج
+										</button>
+									</div>
+								) : null}
+							</div>
 						) : !user ? (
 							<Link className="site-header__primary" to="/student/login">
-								تسجيل دخول الطلاب
+								تسجيل الدخول
 							</Link>
-						) : null}
-						{user ? (
-							<button
-								className="site-header__logout"
-								onClick={handleLogout}
-								title="تسجيل الخروج"
-								type="button"
-							>
-								<span className="material-symbols-outlined">logout</span>
-							</button>
 						) : null}
 						<button
 							aria-expanded={mobileOpen}
@@ -132,6 +150,12 @@ export default function Navbar() {
 						<span className="material-symbols-outlined">close</span>
 					</button>
 				</div>
+				{isStudent ? (
+					<div className="site-drawer__identity">
+						<span className="material-symbols-outlined">account_circle</span>
+						<strong>{user.name || "الطالب"}</strong>
+					</div>
+				) : null}
 				<nav className="site-drawer__links" aria-label="التنقل على الهاتف">
 					{NAV_LINKS.map(({ label, path }) => (
 						<button
@@ -144,15 +168,23 @@ export default function Navbar() {
 							<span className="material-symbols-outlined">arrow_back</span>
 						</button>
 					))}
+					{isStudent ? (
+						<>
+							<button onClick={() => go("/student/dashboard")} type="button">
+								<span>الملف الشخصي</span>
+								<span className="material-symbols-outlined">person</span>
+							</button>
+							<button onClick={() => go("/lectures")} type="button">
+								<span>المحاضرات</span>
+								<span className="material-symbols-outlined">play_circle</span>
+							</button>
+						</>
+					) : null}
 				</nav>
 				<div className="site-drawer__actions">
-					{isStudent ? (
-						<Link onClick={() => setMobileOpen(false)} to="/student/dashboard">
-							لوحة الطالب
-						</Link>
-					) : !user ? (
+					{!user ? (
 						<Link onClick={() => setMobileOpen(false)} to="/student/login">
-							تسجيل دخول الطلاب
+							تسجيل الدخول
 						</Link>
 					) : null}
 					{user ? (

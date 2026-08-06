@@ -90,6 +90,71 @@
 .site-header__primary .material-symbols-outlined {
 	font-size: 19px;
 }
+
+.site-account {
+	position: relative;
+}
+.site-account__trigger {
+	display: flex;
+	min-height: 44px;
+	padding: 8px 16px;
+	align-items: center;
+	gap: 7px;
+	border: 1px solid rgba(0, 109, 53, 0.14);
+	border-radius: 9999px;
+	background: rgba(255, 255, 255, 0.66);
+	color: #006d35;
+	font-weight: 700;
+	cursor: pointer;
+}
+.site-account__trigger .material-symbols-outlined {
+	font-size: 20px;
+	transition: transform 0.2s;
+}
+.site-account__trigger[aria-expanded="true"] .material-symbols-outlined {
+	transform: rotate(180deg);
+}
+.site-account__menu {
+	position: absolute;
+	top: calc(100% + 12px);
+	left: 0;
+	display: grid;
+	width: 220px;
+	padding: 8px;
+	border: 1px solid rgba(0, 109, 53, 0.1);
+	border-radius: 16px;
+	background: rgba(250, 255, 251, 0.98);
+	box-shadow: 0 18px 42px rgba(0, 44, 20, 0.16);
+	backdrop-filter: blur(18px);
+}
+.site-account__menu a,
+.site-account__menu button {
+	display: flex;
+	padding: 11px 12px;
+	align-items: center;
+	gap: 10px;
+	border: 0;
+	border-radius: 10px;
+	background: transparent;
+	color: #3b4a3d;
+	font: inherit;
+	font-weight: 700;
+	text-align: right;
+	cursor: pointer;
+}
+.site-account__menu a:hover {
+	background: rgba(0, 109, 53, 0.08);
+	color: #006d35;
+}
+.site-account__menu button {
+	color: #93000a;
+}
+.site-account__menu button:hover {
+	background: #ffe7e3;
+}
+.site-account__menu .material-symbols-outlined {
+	font-size: 20px;
+}
 .site-header__logout,
 .site-header__menu,
 .site-drawer__head button {
@@ -131,7 +196,8 @@
 	}
 	.site-header__links,
 	.site-header__primary,
-	.site-header__logout {
+	.site-header__logout,
+	.site-account {
 		display: none;
 	}
 	.site-header__menu {
@@ -181,6 +247,19 @@
 	}
 	.site-drawer__head button {
 		color: #3b4a3d;
+	}
+	.site-drawer__identity {
+		display: flex;
+		margin-top: 18px;
+		padding: 14px;
+		align-items: center;
+		gap: 10px;
+		border-radius: 14px;
+		background: rgba(0, 109, 53, 0.08);
+		color: #006d35;
+	}
+	.site-drawer__identity .material-symbols-outlined {
+		font-size: 28px;
 	}
 	.site-drawer__links {
 		display: flex;

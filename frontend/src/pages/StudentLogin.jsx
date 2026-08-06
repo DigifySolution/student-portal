@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import "./Login.css";
 
@@ -11,7 +11,6 @@ const StudentLogin = () => {
 
 	const { login } = useAuth();
 	const navigate = useNavigate();
-	const location = useLocation();
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -35,7 +34,7 @@ const StudentLogin = () => {
 			} else {
 				setError(result.message);
 			}
-		} catch (err) {
+		} catch {
 			setError("حدث خطأ في تسجيل الدخول");
 		} finally {
 			setLoading(false);
@@ -84,7 +83,11 @@ const StudentLogin = () => {
 				</form>
 
 				<div className="back-home">
-					<button className="link-button" onClick={() => navigate("/")}>
+					<button
+						className="link-button"
+						onClick={() => navigate("/")}
+						type="button"
+					>
 						العودة للرئيسية
 					</button>
 				</div>

@@ -1,91 +1,33 @@
 .site-footer {
-	width: 100%;
-	background: #d0e9d6;
-	color: #3b4a3d;
-}
-.site-footer__inner {
-	display: grid;
-	grid-template-columns: 1.2fr 1fr auto;
+	display: flex;
+	min-height: 58px;
+	padding: 10px 24px;
 	align-items: center;
-	gap: 48px;
-	width: min(100% - 48px, 1280px);
-	margin-inline: auto;
-	padding-block: 52px;
-}
-.site-footer__brand strong {
-	display: block;
-	margin-bottom: 8px;
-	color: #006d35;
-	font-size: 1.8rem;
-}
-.site-footer__brand p {
-	max-width: 360px;
-	margin: 0;
-	line-height: 1.7;
-}
-.site-footer__contact {
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-}
-.site-footer__contact div,
-.site-footer__contact a {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	color: #3b4a3d;
-}
-.site-footer__contact .material-symbols-outlined {
-	color: #006d35;
-	font-size: 21px;
-	font-variation-settings: "FILL" 1;
-}
-.site-footer__links {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: flex-end;
-	gap: 22px;
-}
-.site-footer__links a {
-	color: #3b4a3d;
-	font-weight: 700;
-	transition: color 0.2s;
-}
-.site-footer__links a:hover {
-	color: #b02f00;
-}
-.site-footer__copyright {
-	padding: 18px 24px;
+	justify-content: center;
+	gap: 12px;
 	border-top: 1px solid rgba(0, 109, 53, 0.08);
 	background: #d5eedc;
-	color: #006d35;
+	color: #3b4a3d;
 	text-align: center;
 }
-
-@media (max-width: 900px) {
-	.site-footer__inner {
-		grid-template-columns: 1fr 1fr;
-		width: min(100% - 32px, 1280px);
-		gap: 32px;
-		padding-block: 40px;
-	}
-	.site-footer__links {
-		grid-column: 1 / -1;
-		justify-content: flex-start;
-	}
+.site-footer strong {
+	color: #006d35;
+	font-size: 1.05rem;
 }
-
+.site-footer span {
+	font-size: 0.9rem;
+}
 @media (max-width: 560px) {
-	.site-footer__inner {
-		grid-template-columns: 1fr;
-		gap: 26px;
-	}
-	.site-footer__brand strong {
-		font-size: 1.5rem;
-	}
-	.site-footer__links {
-		grid-column: auto;
+	.site-footer {
+		min-height: 54px;
+		padding: 8px 16px;
 		flex-direction: column;
-		gap: 14px;
+		gap: 1px;
+	}
+	.site-footer strong {
+		font-size: 1rem;
+	}
+	.site-footer span {
+		font-size: 0.78rem;
 	}
 }

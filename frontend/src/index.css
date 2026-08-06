@@ -140,7 +140,7 @@
 
 /* ── Material Symbols ── */
 .material-symbols-outlined {
-  font-family: 'Material Symbols Outlined';
+  font-family: 'Material Symbols Outlined', sans-serif;
   font-weight: normal;
   font-style: normal;
   font-size: 24px;
@@ -167,7 +167,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  scrollbar-width: none;
 }
+
+body::-webkit-scrollbar { display: none; }
 
 /* ── Scrollbar ── */
 ::-webkit-scrollbar         { width: 6px; }
