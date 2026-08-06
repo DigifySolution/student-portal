@@ -3,7 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import curriculumService from '../services/curriculumService';
-import { verifyToken } from '../middleware/authMiddleware';
+import { authenticateToken, requireAdmin } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -53,12 +53,14 @@ router.get('/video/:videoId', async (req, res) => {
       const units = await curriculumService.getUnitsByGrade('1HIGH', studentId);
       const firstVidId = units[0]?.lessons?.[0]?.videos?.[0]?.id || 1;
       const data = await curriculumService.getVideoWithPlaylist(firstVidId, studentId);
-      return res.json({ success: true, data });
+      res.json({ success: true, data });
+      return;
     }
 
     const data = await curriculumService.getVideoWithPlaylist(videoId, studentId);
     if (!data) {
-      return res.status(404).json({ success: false, message: 'المحاضرة غير موجودة' });
+      res.status(404).json({ success: false, message: 'المحاضرة غير موجودة' });
+      return;
     }
 
     res.json({ success: true, data });
@@ -100,7 +102,7 @@ router.get('/stream/:videoId', async (req, res) => {
 
     if (range) {
       const parts = range.replace(/bytes=/, '').split('-');
-      const start = parseInt(parts[0], 10);
+      const start = parseInt(parts[0] ?? '', 10);
       const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
       const chunksize = end - start + 1;
       const file = fs.createReadStream(localFilePath, { start, end });
@@ -135,7 +137,8 @@ router.post('/progress', async (req, res) => {
   try {
     const { studentId, videoId, completed, watchedSeconds } = req.body;
     if (!studentId || !videoId) {
-      return res.status(400).json({ success: false, message: 'Missing studentId or videoId' });
+      res.status(400).json({ success: false, message: 'Missing studentId or videoId' });
+      return;
     }
     const result = await curriculumService.markVideoProgress(studentId, videoId, !!completed, watchedSeconds || 0);
     res.json({ success: true, data: result });
@@ -145,6 +148,8 @@ router.post('/progress', async (req, res) => {
 });
 
 // ADMIN API ENDPOINTS (Units, Lessons, Videos CRUD)
+
+router.use('/admin', authenticateToken, requireAdmin);
 
 // POST create unit
 router.post('/admin/units', async (req, res) => {
@@ -245,7 +250,8 @@ router.delete('/admin/videos/:id', async (req, res) => {
 // POST File Upload (for video & PDF files)
 router.post('/admin/upload', upload.single('file'), (req, res) => {
   if (!req.file) {
-    return res.status(400).json({ success: false, message: 'No file uploaded' });
+    res.status(400).json({ success: false, message: 'No file uploaded' });
+    return;
   }
   const fileUrl = `/uploads/${req.file.filename}`;
   res.json({ success: true, url: fileUrl });
