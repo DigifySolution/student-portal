@@ -76,25 +76,29 @@ const CurriculumPage = () => {
 
 	return (
 		<main className="curriculum-page" dir="rtl">
-			<div className="curriculum-page__pattern pattern-bg" />
 			<div className="curriculum-page__inner">
 				<header className="curriculum-hero">
-					<span className="curriculum-hero__eyebrow">المنهج الدراسي</span>
-					<h1 className="curriculum-hero__title">اختر مرحلتك الدراسية</h1>
+					<span className="curriculum-hero__eyebrow">
+						<span className="material-symbols-outlined">auto_stories</span>
+						المنهج الدراسي
+					</span>
+					<h1 className="curriculum-hero__title">
+						اختر <span>مرحلتك</span> الدراسية
+					</h1>
 					<p className="curriculum-hero__subtitle">
 						تصفح منهج الأحياء الشامل الخاص بك ({getGradeTitle(selectedGrade)})
 					</p>
 				</header>
 
 				<div
-					className="curriculum-grades"
+					className="curriculum-switcher"
 					role="tablist"
 					aria-label="المرحلة الدراسية"
 				>
 					{GRADES.map((grade) => (
 						<button
 							aria-selected={selectedGrade === grade.key}
-							className={`curriculum-grades__pill ${
+							className={`curriculum-switcher__pill ${
 								selectedGrade === grade.key ? "is-active" : ""
 							}`}
 							key={grade.key}
@@ -108,17 +112,13 @@ const CurriculumPage = () => {
 				</div>
 
 				{loading ? (
-					<div className="curriculum-state">
-						<span className="material-symbols-outlined curriculum-state__icon">
-							sync
-						</span>
+					<div className="curriculum-state spinner">
+						<span className="material-symbols-outlined">sync</span>
 						<p>جاري تحميل المنهج...</p>
 					</div>
 				) : units.length === 0 ? (
-					<div className="curriculum-state curriculum-state--empty">
-						<span className="material-symbols-outlined curriculum-state__icon">
-							menu_book
-						</span>
+					<div className="curriculum-state">
+						<span className="material-symbols-outlined">menu_book</span>
 						<p>لا توجد وحدات دراسية مضافة لهذه المرحلة حالياً.</p>
 					</div>
 				) : (
@@ -128,56 +128,72 @@ const CurriculumPage = () => {
 							const progress = unit.completed_percentage || 0;
 							const icon = unit.icon || getFallbackIcon(idx);
 							const inProgress = progress > 0;
+							const lessonsCount = unit.lessons?.length;
 
 							return (
 								<article
-									className={`curriculum-card curriculum-card--${theme}`}
+									className="curriculum-card"
 									data-theme={theme}
 									key={unit.id}
 									style={{ "--cc-index": idx }}
 								>
-									<div className="curriculum-card__banner">
-										<span className="curriculum-card__banner-icon">
+									<div className="curriculum-card__head">
+										<span className="curriculum-card__icon">
 											<span className="material-symbols-outlined">{icon}</span>
 										</span>
-										<span className="curriculum-card__badge">
-											الوحدة {unit.unit_number || idx + 1}
-										</span>
-									</div>
-									<div className="curriculum-card__body">
-										<span className="curriculum-card__category">
-											{unit.category || "عام"}
-										</span>
-										<h3 className="curriculum-card__title">{unit.title}</h3>
-										<div className="curriculum-card__progress">
-											<div className="curriculum-card__progress-head">
-												<span>التقدم</span>
-												<strong>{progress}% مكتمل</strong>
-											</div>
-											<div className="curriculum-card__track">
-												<div
-													className="curriculum-card__fill"
-													style={{ width: `${progress}%` }}
-												/>
-											</div>
+										<div className="curriculum-card__badges">
+											<span className="curriculum-card__badge">
+												<span className="material-symbols-outlined">
+													numbers
+												</span>
+												الوحدة {unit.unit_number || idx + 1}
+											</span>
+											<span className="curriculum-card__badge">
+												{unit.category || "عام"}
+											</span>
 										</div>
 									</div>
-									<div className="curriculum-card__actions">
-										<button
-											className={`curriculum-card__cta ${
-												inProgress ? "is-outlined" : ""
-											}`}
-											onClick={() => handleStartStudy(unit)}
-											type="button"
-										>
+
+									<h3 className="curriculum-card__title">{unit.title}</h3>
+
+									{lessonsCount ? (
+										<div className="curriculum-card__meta">
 											<span>
-												{inProgress ? "استكمل المذاكرة" : "ابدأ المذاكرة"}
+												<span className="material-symbols-outlined">
+													play_circle
+												</span>
+												{lessonsCount} دروس
 											</span>
-											<span className="material-symbols-outlined">
-												{inProgress ? "arrow_left_alt" : "play_arrow"}
-											</span>
-										</button>
+										</div>
+									) : null}
+
+									<div className="curriculum-card__progress">
+										<div className="curriculum-card__progress-head">
+											<span>نسبة الإكمال</span>
+											<strong>{progress}% مكتمل</strong>
+										</div>
+										<div className="curriculum-card__track">
+											<div
+												className="curriculum-card__fill"
+												style={{ width: `${progress}%` }}
+											/>
+										</div>
 									</div>
+
+									<button
+										className={`curriculum-card__cta ${
+											inProgress ? "is-outlined" : ""
+										}`}
+										onClick={() => handleStartStudy(unit)}
+										type="button"
+									>
+										<span>
+											{inProgress ? "استكمل المذاكرة" : "ابدأ المذاكرة"}
+										</span>
+										<span className="material-symbols-outlined">
+											{inProgress ? "arrow_left_alt" : "play_arrow"}
+										</span>
+									</button>
 								</article>
 							);
 						})}
