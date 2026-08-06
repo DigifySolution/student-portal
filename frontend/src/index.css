@@ -172,11 +172,22 @@ body {
 
 body::-webkit-scrollbar { display: none; }
 
-/* ── Scrollbar ── */
-::-webkit-scrollbar         { width: 6px; }
-::-webkit-scrollbar-track   { background: #e8ffee; }
-::-webkit-scrollbar-thumb   { background: #62ff96; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #006d35; }
+/* ── Hide scrollbars across the document ── */
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+html::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+* {
+  scrollbar-width: none;
+}
+*::-webkit-scrollbar {
+  display: none;
+}
 
 /* ── RTL number inputs ── */
 input[type="tel"],

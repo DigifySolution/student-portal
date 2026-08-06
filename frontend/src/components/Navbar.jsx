@@ -5,7 +5,6 @@ import "./Navbar.css";
 
 const NAV_LINKS = [
 	{ label: "الرئيسية", path: "/" },
-	{ label: "المميزات", path: "/#features" },
 	{ label: "المنهج", path: "/curriculum" },
 ];
 
