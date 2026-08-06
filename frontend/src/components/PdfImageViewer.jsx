@@ -134,7 +134,7 @@ const PdfImageViewer = ({ testId }) => {
 				setLoading(true);
 				setError(null);
 
-				const response = await axios.get(`/api/tests/${testId}/pages/count`, {
+				const response = await axios.get(`/tests/${testId}/pages/count`, {
 					timeout: 10000, // 10 second timeout
 					headers: {
 						"Cache-Control": "no-cache",

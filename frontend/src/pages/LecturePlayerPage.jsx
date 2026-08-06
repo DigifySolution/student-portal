@@ -42,7 +42,7 @@ const LecturePlayerPage = () => {
   const handleVideoEnded = async () => {
     if (user?.id && videoData?.currentVideo?.id) {
       try {
-        await axios.post('/api/curriculum/progress', {
+        await axios.post('/curriculum/progress', {
           studentId: user.id,
           videoId: videoData.currentVideo.id,
           completed: true,

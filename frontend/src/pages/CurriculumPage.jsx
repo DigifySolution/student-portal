@@ -18,7 +18,7 @@ const CurriculumPage = () => {
     setLoading(true);
     try {
       const studentIdParam = user?.id ? `&studentId=${user.id}` : '';
-      const response = await axios.get(`/api/curriculum/units?grade=${grade}${studentIdParam}`);
+      const response = await axios.get(`/curriculum/units?grade=${grade}${studentIdParam}`);
       if (response.data.success) {
         setUnits(response.data.data);
       }

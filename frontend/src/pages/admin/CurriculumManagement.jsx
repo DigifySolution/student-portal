@@ -29,7 +29,7 @@ const CurriculumManagement = () => {
   const fetchUnits = async (grade) => {
     setLoading(true);
     try {
-      const res = await axios.get(`/api/curriculum/units?grade=${grade}`);
+      const res = await axios.get(`/curriculum/units?grade=${grade}`);
       if (res.data.success) {
         setUnits(res.data.data);
       }
@@ -45,9 +45,9 @@ const CurriculumManagement = () => {
     e.preventDefault();
     try {
       if (editingUnit) {
-        await axios.put(`/api/curriculum/admin/units/${editingUnit.id}`, unitForm);
+        await axios.put(`/curriculum/admin/units/${editingUnit.id}`, unitForm);
       } else {
-        await axios.post('/api/curriculum/admin/units', { ...unitForm, grade: selectedGrade });
+        await axios.post('/curriculum/admin/units', { ...unitForm, grade: selectedGrade });
       }
       setShowUnitModal(false);
       fetchUnits(selectedGrade);
@@ -59,7 +59,7 @@ const CurriculumManagement = () => {
   const handleDeleteUnit = async (id) => {
     if (!window.confirm('هل أنت تأكد من حذف هذه الوحدة وجميع الدروس والفيديوهات التابعة لها؟')) return;
     try {
-      await axios.delete(`/api/curriculum/admin/units/${id}`);
+      await axios.delete(`/curriculum/admin/units/${id}`);
       fetchUnits(selectedGrade);
     } catch (err) {
       console.error('Delete unit error:', err);
@@ -71,9 +71,9 @@ const CurriculumManagement = () => {
     e.preventDefault();
     try {
       if (editingLesson) {
-        await axios.put(`/api/curriculum/admin/lessons/${editingLesson.id}`, lessonForm);
+        await axios.put(`/curriculum/admin/lessons/${editingLesson.id}`, lessonForm);
       } else {
-        await axios.post('/api/curriculum/admin/lessons', { ...lessonForm, unit_id: selectedUnitId });
+        await axios.post('/curriculum/admin/lessons', { ...lessonForm, unit_id: selectedUnitId });
       }
       setShowLessonModal(false);
       fetchUnits(selectedGrade);
@@ -85,7 +85,7 @@ const CurriculumManagement = () => {
   const handleDeleteLesson = async (id) => {
     if (!window.confirm('هل أنت تأكد من حذف هذا الدرس؟')) return;
     try {
-      await axios.delete(`/api/curriculum/admin/lessons/${id}`);
+      await axios.delete(`/curriculum/admin/lessons/${id}`);
       fetchUnits(selectedGrade);
     } catch (err) {
       console.error('Delete lesson error:', err);
@@ -102,7 +102,7 @@ const CurriculumManagement = () => {
 
     setUploadingFile(true);
     try {
-      const res = await axios.post('/api/curriculum/admin/upload', formData, {
+      const res = await axios.post('/curriculum/admin/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       if (res.data.success) {
@@ -120,9 +120,9 @@ const CurriculumManagement = () => {
     e.preventDefault();
     try {
       if (editingVideo) {
-        await axios.put(`/api/curriculum/admin/videos/${editingVideo.id}`, videoForm);
+        await axios.put(`/curriculum/admin/videos/${editingVideo.id}`, videoForm);
       } else {
-        await axios.post('/api/curriculum/admin/videos', { ...videoForm, lesson_id: selectedLessonId });
+        await axios.post('/curriculum/admin/videos', { ...videoForm, lesson_id: selectedLessonId });
       }
       setShowVideoModal(false);
       fetchUnits(selectedGrade);
@@ -134,7 +134,7 @@ const CurriculumManagement = () => {
   const handleDeleteVideo = async (id) => {
     if (!window.confirm('هل أنت تأكد من حذف هذا الفيديو؟')) return;
     try {
-      await axios.delete(`/api/curriculum/admin/videos/${id}`);
+      await axios.delete(`/curriculum/admin/videos/${id}`);
       fetchUnits(selectedGrade);
     } catch (err) {
       console.error('Delete video error:', err);
