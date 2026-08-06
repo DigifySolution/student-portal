@@ -1,46 +1,53 @@
 import React from 'react';
 
-const Footer = () => {
+export default function Footer() {
   return (
-    <footer className="w-full mt-16" style={{ background: '#d0e9d6' }}>
-      {/* Main footer content */}
+    <footer dir="rtl" style={{ background: '#d0e9d6' }}>
+      {/* ── Main row ── */}
       <div
-        className="flex flex-col md:flex-row-reverse justify-between items-start md:items-center gap-12 px-6 py-16 w-full max-w-7xl mx-auto"
+        className="max-w-7xl mx-auto px-6 py-14 flex flex-col md:flex-row items-start md:items-center justify-between gap-10"
       >
-        {/* Brand + Contact */}
-        <div className="flex flex-col gap-6 text-right w-full md:w-auto">
-          <div className="text-4xl font-bold text-[#006d35]">
+        {/* Brand + contact – right */}
+        <div className="flex flex-col gap-5">
+          <span className="font-bold" style={{ fontSize: '1.6rem', color: '#006d35' }}>
             أكاديمية الأحياء
-          </div>
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-3 text-[#3b4a3d]">
+          </span>
+
+          <div className="flex flex-col gap-2">
+            {/* Location */}
+            <div className="flex flex-row-reverse items-center gap-2" style={{ color: '#3b4a3d', fontSize: '0.95rem' }}>
               <span
-                className="material-symbols-outlined text-[#006d35]"
-                style={{ fontVariationSettings: "'FILL' 1" }}
+                className="material-symbols-outlined"
+                style={{ fontSize: 20, fontVariationSettings: "'FILL' 1", color: '#006d35' }}
               >
                 location_on
               </span>
-              <span className="text-xl">سنتر الفتح ٢</span>
+              <span>سنتر الفتح 2</span>
             </div>
-            <div className="flex items-center gap-3 text-[#3b4a3d]" dir="ltr">
+
+            {/* Phone */}
+            <div className="flex flex-row-reverse items-center gap-2" style={{ color: '#3b4a3d', fontSize: '0.95rem' }} dir="ltr">
               <span
-                className="material-symbols-outlined text-[#006d35]"
-                style={{ fontVariationSettings: "'FILL' 1" }}
+                className="material-symbols-outlined"
+                style={{ fontSize: 20, fontVariationSettings: "'FILL' 1", color: '#006d35' }}
               >
                 call
               </span>
-              <span className="text-xl">+20 10 92600559</span>
+              <span>+20 10 92600559</span>
             </div>
           </div>
         </div>
 
-        {/* Links */}
-        <div className="flex flex-wrap justify-center md:justify-end gap-8 w-full md:w-auto">
+        {/* Policy links – left */}
+        <div className="flex flex-wrap gap-6">
           {['سياسة الخصوصية', 'شروط الخدمة', 'دعم الطلاب'].map((label) => (
             <a
               key={label}
               href="#"
-              className="text-2xl font-bold text-[#3b4a3d] hover:text-[#b02f00] opacity-80 hover:opacity-100 transition-all"
+              className="font-semibold transition-colors duration-200"
+              style={{ color: '#3b4a3d', fontSize: '0.95rem', opacity: 0.85 }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#b02f00'; e.currentTarget.style.opacity = '1'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = '#3b4a3d'; e.currentTarget.style.opacity = '0.85'; }}
             >
               {label}
             </a>
@@ -48,14 +55,19 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Copyright bar */}
-      <div className="w-full py-6 px-6 text-center" style={{ background: '#d5eedc', borderTop: '1px solid rgba(0,109,53,0.10)' }}>
-        <div className="text-xl text-[#006d35] opacity-80 max-w-7xl mx-auto">
-          © ٢٠٢٧ أكاديمية الأحياء. جميع الحقوق محفوظة
-        </div>
+      {/* ── Copyright bar ── */}
+      <div
+        className="w-full text-center py-4"
+        style={{
+          background: '#d5eedc',
+          borderTop: '1px solid rgba(0,109,53,0.08)',
+          fontSize: '0.85rem',
+          color: '#006d35',
+          opacity: 0.85,
+        }}
+      >
+        © 2027 أكاديمية الأحياء. جميع الحقوق محفوظة
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

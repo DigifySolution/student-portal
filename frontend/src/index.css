@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  /* Colors - matching HTML mockup exactly */
+  /* ── Brand colors ── */
   --color-primary: #006d35;
   --color-primary-container: #00e676;
   --color-primary-fixed: #62ff96;
@@ -30,9 +30,9 @@
   --color-on-tertiary-fixed: #3b0900;
   --color-on-tertiary-fixed-variant: #862200;
 
+  /* ── Surface / background ── */
   --color-background: #e8ffee;
   --color-on-background: #0a2014;
-
   --color-surface: #e8ffee;
   --color-surface-dim: #c7e0ce;
   --color-surface-bright: #e8ffee;
@@ -45,102 +45,107 @@
   --color-surface-container-lowest: #ffffff;
   --color-on-surface: #0a2014;
   --color-on-surface-variant: #3b4a3d;
-
   --color-inverse-surface: #203529;
   --color-inverse-on-surface: #def7e4;
 
+  /* ── Outline / dividers ── */
   --color-outline: #6b7b6c;
   --color-outline-variant: #bacbb9;
 
+  /* ── Error ── */
   --color-error: #ba1a1a;
   --color-error-container: #ffdad6;
   --color-on-error: #ffffff;
   --color-on-error-container: #93000a;
 
-  /* Font families */
-  --font-family-body-lg: "IBM Plex Sans Arabic", system-ui, sans-serif;
-  --font-family-body-md: "IBM Plex Sans Arabic", system-ui, sans-serif;
-  --font-family-headline-sm: "IBM Plex Sans Arabic", system-ui, sans-serif;
-  --font-family-headline-md: "IBM Plex Sans Arabic", system-ui, sans-serif;
-  --font-family-display-lg: "IBM Plex Sans Arabic", system-ui, sans-serif;
-  --font-family-display-lg-mobile: "IBM Plex Sans Arabic", system-ui, sans-serif;
-  --font-family-label-md: "IBM Plex Sans Arabic", system-ui, sans-serif;
+  /* ── Typography scale ── */
+  --font-family-sans: "IBM Plex Sans Arabic", system-ui, sans-serif;
 
-  /* Spacing */
-  --spacing-unit: 8px;
-  --spacing-section-gap: 64px;
-  --spacing-gutter: 16px;
-  --spacing-container-margin: 24px;
-
-  /* Border radius */
-  --radius-DEFAULT: 0.25rem;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.75rem;
-  --radius-full: 9999px;
+  --font-size-display-lg: 4rem;           /* 64px */
+  --line-height-display-lg: 1.10;
+  --font-size-display-lg-mobile: 2.5rem;  /* 40px */
+  --line-height-display-lg-mobile: 1.15;
+  --font-size-headline-md: 1.75rem;       /* 28px */
+  --line-height-headline-md: 1.25;
+  --font-size-headline-sm: 1.5rem;        /* 24px */
+  --line-height-headline-sm: 1.30;
+  --font-size-title-lg: 1.375rem;         /* 22px */
+  --font-size-body-lg: 1.125rem;          /* 18px */
+  --line-height-body-lg: 1.6;
+  --font-size-body-md: 1rem;              /* 16px */
+  --font-size-label-lg: 0.875rem;         /* 14px */
+  --font-size-label-md: 0.75rem;          /* 12px */
 }
 
-/* Animation keyframes */
+/* ── Animations ── */
 @keyframes fadeInUp {
-  0% { opacity: 0; transform: translateY(30px); }
+  0%   { opacity: 0; transform: translateY(32px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes bounce4s {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
+@keyframes bounceSlow {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
 }
 
-/* Utility classes */
+@keyframes pulseSoft {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.7; }
+}
+
+/* ── Utility classes ── */
 .animate-fade-in-up {
-  animation: fadeInUp 0.8s ease-out forwards;
+  animation: fadeInUp 0.7s ease-out forwards;
   opacity: 0;
 }
-
-.delay-100 { animation-delay: 0.1s; }
-.delay-200 { animation-delay: 0.2s; }
-.delay-300 { animation-delay: 0.3s; }
-.delay-400 { animation-delay: 0.4s; }
-.delay-500 { animation-delay: 0.5s; }
+.delay-100 { animation-delay: 0.10s; }
+.delay-200 { animation-delay: 0.20s; }
+.delay-300 { animation-delay: 0.30s; }
+.delay-400 { animation-delay: 0.40s; }
+.delay-500 { animation-delay: 0.50s; }
 
 .animate-bounce-slow {
-  animation: bounce4s 4s infinite;
+  animation: bounceSlow 3.5s ease-in-out infinite;
 }
 
-/* Glassmorphic card */
+/* ── Glassmorphic card ── */
 .glass-card {
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 10px 30px rgba(0, 109, 53, 0.1);
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 8px 32px rgba(0, 109, 53, 0.10);
 }
 
+/* ── Gradient text ── */
 .text-gradient {
-  background: linear-gradient(135deg, #00e676, #006d35);
+  background: linear-gradient(135deg, #00e676 0%, #006d35 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.hero-bg {
-  background: radial-gradient(circle at 50% 50%, rgba(98, 255, 150, 0.15) 0%, rgba(232, 255, 238, 1) 100%);
-}
-
+/* ── DNA/Biology pattern background ── */
 .pattern-bg {
-  background-image: url('https://lh3.googleusercontent.com/aida/AP1WRLvOFR9YnerCDbYI0CLmu5sVQSuIOvfAGpb5JUFoUe8a5OvpZ0GVJ75BE1vp0_YaJb5QMdVlMcU0SVv_zPplY5j1WgsEGjFYqK1cwNzjSl60ibV1Xuzt_KMGqumabE3ZbbMtIdhrjawgwKTmCYIJ0M_pfOi8eYPoBjdB77V8QFWIQnGC8X_Z__tynVSIqZw_HeeH1ii2Wjdu83sXE1ikaZBVAZlCBq4ay4Kbuvr3JaGjJaSBqsYgSTSsJA');
-  background-size: cover;
-  background-position: center;
-  opacity: 0.15;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23006d35' fill-opacity='0.07'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
-/* Material Symbols */
+/* ── Hero radial gradient background ── */
+.hero-bg {
+  background: radial-gradient(ellipse 80% 60% at 60% 40%,
+    rgba(98, 255, 150, 0.22) 0%,
+    rgba(232, 255, 238, 0.95) 65%,
+    rgba(232, 255, 238, 1) 100%);
+}
+
+/* ── Material Symbols ── */
 .material-symbols-outlined {
   font-family: 'Material Symbols Outlined';
   font-weight: normal;
   font-style: normal;
   font-size: 24px;
-  display: inline-block;
   line-height: 1;
+  display: inline-block;
   text-transform: none;
   letter-spacing: normal;
   word-wrap: normal;
@@ -150,7 +155,9 @@
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
-/* Base styles */
+/* ── Base ── */
+*, *::before, *::after { box-sizing: border-box; }
+
 body {
   font-family: 'IBM Plex Sans Arabic', system-ui, -apple-system, sans-serif;
   background-color: #e8ffee;
@@ -158,16 +165,17 @@ body {
   direction: rtl;
   text-align: right;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #e8ffee; }
-::-webkit-scrollbar-thumb { background: #62ff96; border-radius: 4px; }
+/* ── Scrollbar ── */
+::-webkit-scrollbar         { width: 6px; }
+::-webkit-scrollbar-track   { background: #e8ffee; }
+::-webkit-scrollbar-thumb   { background: #62ff96; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #006d35; }
 
-/* RTL input fixes */
+/* ── RTL number inputs ── */
 input[type="tel"],
 input[type="password"],
 input[type="number"] {
