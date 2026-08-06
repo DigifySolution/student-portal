@@ -1,45 +1,91 @@
-/* Footer Styles with RTL Support */
-.footer {
-	background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-	color: #475569;
-	padding: 1.5rem 0 1rem 0;
-	margin-top: auto;
-	border-top: 1px solid #cbd5e1;
+.site-footer {
+	width: 100%;
+	background: #d0e9d6;
+	color: #3b4a3d;
 }
-
-.footer-container {
-	max-width: 1200px;
-	margin: 0 auto;
-	padding: 0 20px;
+.site-footer__inner {
+	display: grid;
+	grid-template-columns: 1.2fr 1fr auto;
+	align-items: center;
+	gap: 48px;
+	width: min(100% - 48px, 1280px);
+	margin-inline: auto;
+	padding-block: 52px;
 }
-
-.footer-bottom {
-	text-align: center;
-	color: #64748b;
+.site-footer__brand strong {
+	display: block;
+	margin-bottom: 8px;
+	color: #006d35;
+	font-size: 1.8rem;
 }
-
-.footer-bottom p {
+.site-footer__brand p {
+	max-width: 360px;
 	margin: 0;
-	font-size: 0.9rem;
+	line-height: 1.7;
+}
+.site-footer__contact {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+.site-footer__contact div,
+.site-footer__contact a {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	color: #3b4a3d;
+}
+.site-footer__contact .material-symbols-outlined {
+	color: #006d35;
+	font-size: 21px;
+	font-variation-settings: "FILL" 1;
+}
+.site-footer__links {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: 22px;
+}
+.site-footer__links a {
+	color: #3b4a3d;
+	font-weight: 700;
+	transition: color 0.2s;
+}
+.site-footer__links a:hover {
+	color: #b02f00;
+}
+.site-footer__copyright {
+	padding: 18px 24px;
+	border-top: 1px solid rgba(0, 109, 53, 0.08);
+	background: #d5eedc;
+	color: #006d35;
+	text-align: center;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-	.footer {
-		padding: 1rem 0 0.5rem 0;
+@media (max-width: 900px) {
+	.site-footer__inner {
+		grid-template-columns: 1fr 1fr;
+		width: min(100% - 32px, 1280px);
+		gap: 32px;
+		padding-block: 40px;
 	}
-
-	.footer-container {
-		padding: 0 15px;
+	.site-footer__links {
+		grid-column: 1 / -1;
+		justify-content: flex-start;
 	}
 }
 
-@media (max-width: 480px) {
-	.footer {
-		padding: 0.75rem 0 0.5rem 0;
+@media (max-width: 560px) {
+	.site-footer__inner {
+		grid-template-columns: 1fr;
+		gap: 26px;
 	}
-
-	.footer-container {
-		padding: 0 10px;
+	.site-footer__brand strong {
+		font-size: 1.5rem;
+	}
+	.site-footer__links {
+		grid-column: auto;
+		flex-direction: column;
+		gap: 14px;
 	}
 }

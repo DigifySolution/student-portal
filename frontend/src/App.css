@@ -6,7 +6,8 @@
 }
 
 body {
-	font-family: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	font-family:
+		"IBM Plex Sans Arabic", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 	line-height: 1.6;
 	color: #0a2014;
 	background-color: #e8ffee;
@@ -20,7 +21,7 @@ body {
 
 .main-content {
 	flex: 1;
-	padding: 0;
+	padding: 76px 0 0;
 }
 
 /* Loading State */
@@ -129,7 +130,7 @@ body {
 /* Responsive Design */
 @media (max-width: 768px) {
 	.main-content {
-		padding: 0;
+		padding: 68px 0 0;
 	}
 
 	.btn {
@@ -145,7 +146,7 @@ body {
 
 @media (max-width: 480px) {
 	.main-content {
-		padding: 0;
+		padding: 68px 0 0;
 	}
 
 	.btn {
