@@ -200,8 +200,12 @@ class CurriculumService {
     }
   }
 
-  // Fetch units for a given grade with nested lessons & videos, plus student progress calculation
-  public async getUnitsByGrade(grade: string, studentId?: number): Promise<Unit[]> {
+  // Public catalog responses include lesson titles only; video data is opt-in for admin use.
+  public async getUnitsByGrade(
+    grade: string,
+    studentId?: number,
+    includeVideos = false,
+  ): Promise<Unit[]> {
     const unitsRes = await database.query(
       `SELECT * FROM units WHERE grade = $1 ORDER BY unit_number ASC`,
       [grade]
@@ -216,13 +220,14 @@ class CurriculumService {
       );
       const lessons: Lesson[] = lessonsRes.rows;
 
-      let totalVideosCount = 0;
-      let completedVideosCount = 0;
-
       for (const lesson of lessons) {
+        if (!includeVideos) {
+          continue;
+        }
+
         const videosRes = await database.query(
           `SELECT * FROM lesson_videos WHERE lesson_id = $1 ORDER BY video_order ASC`,
-          [lesson.id]
+          [lesson.id],
         );
         const videos: LessonVideo[] = videosRes.rows;
 
@@ -230,20 +235,16 @@ class CurriculumService {
           for (const vid of videos) {
             const progRes = await database.query(
               `SELECT completed FROM student_video_progress WHERE student_id = $1 AND video_id = $2`,
-              [studentId, vid.id]
+              [studentId, vid.id],
             );
             vid.completed = progRes.rows[0]?.completed || false;
-            if (vid.completed) completedVideosCount++;
           }
         }
-        totalVideosCount += videos.length;
+
         lesson.videos = videos;
       }
 
       unit.lessons = lessons;
-      unit.completed_percentage = totalVideosCount > 0 
-        ? Math.round((completedVideosCount / totalVideosCount) * 100) 
-        : 0;
     }
 
     return units;

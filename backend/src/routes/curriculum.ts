@@ -3,7 +3,8 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import curriculumService from '../services/curriculumService';
-import { authenticateToken, requireAdmin } from '../middleware/auth';
+import { authenticateToken, requireAdmin, requireStudent } from '../middleware/auth';
+import type { AuthenticatedRequest } from '../types';
 
 const router = express.Router();
 
@@ -33,8 +34,7 @@ const upload = multer({
 router.get('/units', async (req, res) => {
   try {
     const grade = (req.query.grade as string) || '1HIGH';
-    const studentId = req.query.studentId ? parseInt(req.query.studentId as string, 10) : undefined;
-    const units = await curriculumService.getUnitsByGrade(grade, studentId);
+    const units = await curriculumService.getUnitsByGrade(grade);
     res.json({ success: true, data: units });
   } catch (error: any) {
     console.error('Error getting units:', error);
@@ -43,14 +43,14 @@ router.get('/units', async (req, res) => {
 });
 
 // GET specific video playback view with playlist & progress
-router.get('/video/:videoId', async (req, res) => {
+router.get('/video/:videoId', authenticateToken, requireStudent, async (req, res) => {
   try {
-    const videoId = parseInt(req.params.videoId, 10);
-    const studentId = req.query.studentId ? parseInt(req.query.studentId as string, 10) : undefined;
+    const videoId = parseInt(req.params.videoId as string, 10);
+    const studentId = (req as AuthenticatedRequest).user?.id;
 
     if (isNaN(videoId)) {
       // If no valid video ID provided, fetch default first video of 1HIGH
-      const units = await curriculumService.getUnitsByGrade('1HIGH', studentId);
+      const units = await curriculumService.getUnitsByGrade('1HIGH', studentId, true);
       const firstVidId = units[0]?.lessons?.[0]?.videos?.[0]?.id || 1;
       const data = await curriculumService.getVideoWithPlaylist(firstVidId, studentId);
       res.json({ success: true, data });
@@ -70,10 +70,43 @@ router.get('/video/:videoId', async (req, res) => {
   }
 });
 
-// GET Secure Video Stream via HTTP Range
-router.get('/stream/:videoId', async (req, res) => {
+// GET protected PDF/material for a video
+router.get('/material/:videoId', authenticateToken, requireStudent, async (req, res) => {
   try {
-    const videoId = parseInt(req.params.videoId, 10);
+    const videoId = parseInt(req.params.videoId as string, 10);
+    const data = await curriculumService.getVideoWithPlaylist(videoId);
+    const pdfUrl = data?.currentVideo?.pdf_url;
+
+    if (!pdfUrl) {
+      res.status(404).json({ success: false, message: 'المادة غير موجودة' });
+      return;
+    }
+
+    if (pdfUrl.startsWith('http://') || pdfUrl.startsWith('https://')) {
+      res.redirect(pdfUrl);
+      return;
+    }
+
+    const localFilePath = path.isAbsolute(pdfUrl)
+      ? pdfUrl
+      : path.join(process.cwd(), pdfUrl.startsWith('/') ? pdfUrl.slice(1) : pdfUrl);
+
+    if (!fs.existsSync(localFilePath)) {
+      res.status(404).json({ success: false, message: 'ملف المادة غير موجود' });
+      return;
+    }
+
+    res.sendFile(localFilePath);
+  } catch (error: any) {
+    console.error('Error serving curriculum material:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// GET Secure Video Stream via HTTP Range
+router.get('/stream/:videoId', authenticateToken, requireStudent, async (req, res) => {
+  try {
+    const videoId = parseInt(req.params.videoId as string, 10);
     const data = await curriculumService.getVideoWithPlaylist(videoId);
 
     if (!data || !data.currentVideo) {
@@ -133,13 +166,20 @@ router.get('/stream/:videoId', async (req, res) => {
 });
 
 // POST Mark Video Progress
-router.post('/progress', async (req, res) => {
+router.post('/progress', authenticateToken, requireStudent, async (req, res) => {
   try {
     const { studentId, videoId, completed, watchedSeconds } = req.body;
     if (!studentId || !videoId) {
       res.status(400).json({ success: false, message: 'Missing studentId or videoId' });
       return;
     }
+
+    const authenticatedStudentId = (req as AuthenticatedRequest).user?.id;
+    if (authenticatedStudentId !== Number(studentId)) {
+      res.status(403).json({ success: false, message: 'لا يمكنك تحديث تقدم طالب آخر' });
+      return;
+    }
+
     const result = await curriculumService.markVideoProgress(studentId, videoId, !!completed, watchedSeconds || 0);
     res.json({ success: true, data: result });
   } catch (error: any) {
@@ -150,6 +190,18 @@ router.post('/progress', async (req, res) => {
 // ADMIN API ENDPOINTS (Units, Lessons, Videos CRUD)
 
 router.use('/admin', authenticateToken, requireAdmin);
+
+// Admin-only catalog response includes the video records needed by the editor.
+router.get('/admin/units', async (req, res) => {
+  try {
+    const grade = (req.query.grade as string) || '1HIGH';
+    const units = await curriculumService.getUnitsByGrade(grade, undefined, true);
+    res.json({ success: true, data: units });
+  } catch (error: any) {
+    console.error('Error getting admin curriculum units:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
 
 // POST create unit
 router.post('/admin/units', async (req, res) => {

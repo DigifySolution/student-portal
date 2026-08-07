@@ -10,12 +10,12 @@ import Navbar from "./components/Navbar";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
+import CurriculumManagement from "./pages/admin/CurriculumManagement";
 import DashboardHomePage from "./pages/admin/DashboardHomePage";
 import StudentManagement from "./pages/admin/StudentManagement";
 import TestManagement from "./pages/admin/TestManagement";
-import CurriculumManagement from "./pages/admin/CurriculumManagement";
-import Home from "./pages/Home";
 import CurriculumPage from "./pages/CurriculumPage";
+import Home from "./pages/Home";
 import LecturePlayerPage from "./pages/LecturePlayerPage";
 import StudentAutoLogin from "./pages/StudentAutoLogin";
 import StudentDashboard from "./pages/StudentDashboard";
@@ -25,7 +25,7 @@ import TestTaking from "./pages/TestTaking";
 import "./App.css";
 
 // Protected Route Component
-const ProtectedRoute = ({ children, allowedTypes }) => {
+const ProtectedRoute = ({ children, allowedTypes, allowUrlAuth = false }) => {
 	const { user, loading } = useAuth();
 	const [searchParams] = useSearchParams();
 
@@ -37,7 +37,7 @@ const ProtectedRoute = ({ children, allowedTypes }) => {
 	}
 
 	// Allow access if there's a valid token in URL for student dashboard
-	if (!user && token && userData) {
+	if (allowUrlAuth && !user && token && userData) {
 		return children;
 	}
 
@@ -62,14 +62,21 @@ const AppContent = () => {
 					<Routes>
 						<Route path="/" element={<Home />} />
 						<Route path="/curriculum" element={<CurriculumPage />} />
-						<Route path="/lectures" element={<LecturePlayerPage />} />
+						<Route
+							path="/lectures"
+							element={
+								<ProtectedRoute allowedTypes={["student"]}>
+									<LecturePlayerPage />
+								</ProtectedRoute>
+							}
+						/>
 						<Route path="/student/login" element={<StudentLogin />} />
 						<Route path="/student/auto-login" element={<StudentAutoLogin />} />
 						<Route path="/admin/login" element={<AdminLogin />} />
 						<Route
 							path="/student/dashboard"
 							element={
-								<ProtectedRoute allowedTypes={["student"]}>
+								<ProtectedRoute allowedTypes={["student"]} allowUrlAuth>
 									<StudentDashboard />
 								</ProtectedRoute>
 							}
