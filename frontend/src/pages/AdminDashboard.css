@@ -1,17 +1,21 @@
 .admin-dashboard-layout {
 	display: flex;
-	padding-top: 60px; /* Navbar height */
+	min-height: 100vh;
+	padding-top: 76px;
+	background: #e8ffee;
 }
 
 .admin-main-content {
 	flex-grow: 1;
+	min-width: 0;
 	padding: 20px;
-	margin-right: 250px; /* Sidebar width */
-	width: calc(100% - 250px);
+	margin-right: 258px;
+	width: calc(100% - 258px);
 }
 
 @media (max-width: 768px) {
 	.admin-main-content {
+		padding: 20px 12px;
 		margin-right: 0;
 		width: 100%;
 	}
