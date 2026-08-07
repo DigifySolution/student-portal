@@ -1,65 +1,143 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import "./CurriculumManagement.css";
+
+const GRADES = [
+	{ value: "1HIGH", label: "الصف الأول الثانوي", shortLabel: "الأول الثانوي" },
+	{
+		value: "2HIGH",
+		label: "الصف الثاني الثانوي",
+		shortLabel: "الثاني الثانوي",
+	},
+	{
+		value: "3HIGH",
+		label: "الصف الثالث الثانوي",
+		shortLabel: "الثالث الثانوي",
+	},
+];
+
+const EMPTY_UNIT = {
+	title: "",
+	category: "",
+	description: "",
+	unit_number: 1,
+	icon: "biotech",
+	color_theme: "primary",
+};
+
+const EMPTY_LESSON = {
+	title: "",
+	description: "",
+	lesson_number: 1,
+};
+
+const EMPTY_VIDEO = {
+	title: "",
+	duration: "30:00",
+	video_url: "",
+	pdf_url: "",
+	video_order: 1,
+};
+
+function AdminModal({ title, eyebrow, children, onClose, wide = false }) {
+	return (
+		<div className="admin-curriculum-modal">
+			<div
+				aria-modal="true"
+				className={`admin-curriculum-modal__panel ${wide ? "is-wide" : ""}`}
+				role="dialog"
+				aria-label={title}
+			>
+				<div className="admin-curriculum-modal__header">
+					<div>
+						<span className="admin-curriculum-modal__eyebrow">{eyebrow}</span>
+						<h2>{title}</h2>
+					</div>
+					<button
+						aria-label="إغلاق النافذة"
+						className="admin-curriculum-icon-button"
+						onClick={onClose}
+						type="button"
+					>
+						<span className="material-symbols-outlined">close</span>
+					</button>
+				</div>
+				{children}
+			</div>
+		</div>
+	);
+}
 
 const CurriculumManagement = () => {
 	const [selectedGrade, setSelectedGrade] = useState("1HIGH");
 	const [units, setUnits] = useState([]);
 	const [loading, setLoading] = useState(true);
 
-	// Modals & forms state
 	const [showUnitModal, setShowUnitModal] = useState(false);
 	const [editingUnit, setEditingUnit] = useState(null);
-	const [unitForm, setUnitForm] = useState({
-		title: "",
-		category: "",
-		description: "",
-		unit_number: 1,
-		icon: "biotech",
-		color_theme: "primary",
-	});
+	const [unitForm, setUnitForm] = useState(EMPTY_UNIT);
 
 	const [showLessonModal, setShowLessonModal] = useState(false);
 	const [selectedUnitId, setSelectedUnitId] = useState(null);
 	const [editingLesson, setEditingLesson] = useState(null);
-	const [lessonForm, setLessonForm] = useState({
-		title: "",
-		description: "",
-		lesson_number: 1,
-	});
+	const [lessonForm, setLessonForm] = useState(EMPTY_LESSON);
 
 	const [showVideoModal, setShowVideoModal] = useState(false);
 	const [selectedLessonId, setSelectedLessonId] = useState(null);
 	const [editingVideo, setEditingVideo] = useState(null);
-	const [videoForm, setVideoForm] = useState({
-		title: "",
-		duration: "30:00",
-		video_url: "",
-		pdf_url: "",
-		video_order: 1,
-	});
+	const [videoForm, setVideoForm] = useState(EMPTY_VIDEO);
 	const [uploadingFile, setUploadingFile] = useState(false);
 
-	useEffect(() => {
-		fetchUnits(selectedGrade);
-	}, [selectedGrade]);
-
-	const fetchUnits = async (grade) => {
+	const fetchUnits = useCallback(async (grade) => {
 		setLoading(true);
 		try {
-			const res = await axios.get(`/curriculum/admin/units?grade=${grade}`);
-			if (res.data.success) {
-				setUnits(res.data.data);
-			}
-		} catch (err) {
-			console.error("Error fetching units:", err);
+			const response = await axios.get(
+				`/curriculum/admin/units?grade=${grade}`,
+			);
+			if (response.data.success) setUnits(response.data.data);
+		} catch (error) {
+			console.error("Error fetching units:", error);
 		} finally {
 			setLoading(false);
 		}
+	}, []);
+
+	useEffect(() => {
+		fetchUnits(selectedGrade);
+	}, [fetchUnits, selectedGrade]);
+
+	const openUnitModal = (unit = null) => {
+		setEditingUnit(unit);
+		setUnitForm(
+			unit ? { ...unit } : { ...EMPTY_UNIT, unit_number: units.length + 1 },
+		);
+		setShowUnitModal(true);
 	};
 
-	// Unit Operations
-	const handleSaveUnit = async (e) => {
-		e.preventDefault();
+	const openLessonModal = (unit, lesson = null) => {
+		setSelectedUnitId(unit.id);
+		setEditingLesson(lesson);
+		setLessonForm(
+			lesson
+				? { ...lesson }
+				: { ...EMPTY_LESSON, lesson_number: (unit.lessons?.length || 0) + 1 },
+		);
+		setShowLessonModal(true);
+	};
+
+	const openVideoModal = (lesson, video = null) => {
+		setSelectedLessonId(lesson.id);
+		setEditingVideo(video);
+		setVideoForm(
+			video
+				? { ...video }
+				: { ...EMPTY_VIDEO, video_order: (lesson.videos?.length || 0) + 1 },
+		);
+		setShowVideoModal(true);
+	};
+
+	const handleSaveUnit = async (event) => {
+		event.preventDefault();
 		try {
 			if (editingUnit) {
 				await axios.put(`/curriculum/admin/units/${editingUnit.id}`, unitForm);
@@ -70,30 +148,25 @@ const CurriculumManagement = () => {
 				});
 			}
 			setShowUnitModal(false);
-			fetchUnits(selectedGrade);
-		} catch (err) {
-			console.error("Save unit error:", err);
+			await fetchUnits(selectedGrade);
+		} catch (error) {
+			console.error("Save unit error:", error);
 		}
 	};
 
 	const handleDeleteUnit = async (id) => {
-		if (
-			!window.confirm(
-				"هل أنت تأكد من حذف هذه الوحدة وجميع الدروس والفيديوهات التابعة لها؟",
-			)
-		)
+		if (!window.confirm("هل أنت متأكد من حذف هذه الوحدة وجميع محتوياتها؟"))
 			return;
 		try {
 			await axios.delete(`/curriculum/admin/units/${id}`);
-			fetchUnits(selectedGrade);
-		} catch (err) {
-			console.error("Delete unit error:", err);
+			await fetchUnits(selectedGrade);
+		} catch (error) {
+			console.error("Delete unit error:", error);
 		}
 	};
 
-	// Lesson Operations
-	const handleSaveLesson = async (e) => {
-		e.preventDefault();
+	const handleSaveLesson = async (event) => {
+		event.preventDefault();
 		try {
 			if (editingLesson) {
 				await axios.put(
@@ -107,48 +180,46 @@ const CurriculumManagement = () => {
 				});
 			}
 			setShowLessonModal(false);
-			fetchUnits(selectedGrade);
-		} catch (err) {
-			console.error("Save lesson error:", err);
+			await fetchUnits(selectedGrade);
+		} catch (error) {
+			console.error("Save lesson error:", error);
 		}
 	};
 
 	const handleDeleteLesson = async (id) => {
-		if (!window.confirm("هل أنت تأكد من حذف هذا الدرس؟")) return;
+		if (!window.confirm("هل أنت متأكد من حذف هذا الدرس؟")) return;
 		try {
 			await axios.delete(`/curriculum/admin/lessons/${id}`);
-			fetchUnits(selectedGrade);
-		} catch (err) {
-			console.error("Delete lesson error:", err);
+			await fetchUnits(selectedGrade);
+		} catch (error) {
+			console.error("Delete lesson error:", error);
 		}
 	};
 
-	// Video Operations
-	const handleFileUpload = async (e, field) => {
-		const file = e.target.files[0];
+	const handleFileUpload = async (event, field) => {
+		const file = event.target.files[0];
 		if (!file) return;
 
 		const formData = new FormData();
 		formData.append("file", file);
-
 		setUploadingFile(true);
 		try {
-			const res = await axios.post("/curriculum/admin/upload", formData, {
+			const response = await axios.post("/curriculum/admin/upload", formData, {
 				headers: { "Content-Type": "multipart/form-data" },
 			});
-			if (res.data.success) {
-				setVideoForm((prev) => ({ ...prev, [field]: res.data.url }));
+			if (response.data.success) {
+				setVideoForm((current) => ({ ...current, [field]: response.data.url }));
 			}
-		} catch (err) {
-			console.error("File upload error:", err);
+		} catch (error) {
+			console.error("File upload error:", error);
 			alert("فشل رفع الملف، يرجى المحاولة مرة أخرى");
 		} finally {
 			setUploadingFile(false);
 		}
 	};
 
-	const handleSaveVideo = async (e) => {
-		e.preventDefault();
+	const handleSaveVideo = async (event) => {
+		event.preventDefault();
 		try {
 			if (editingVideo) {
 				await axios.put(
@@ -162,443 +233,595 @@ const CurriculumManagement = () => {
 				});
 			}
 			setShowVideoModal(false);
-			fetchUnits(selectedGrade);
-		} catch (err) {
-			console.error("Save video error:", err);
+			await fetchUnits(selectedGrade);
+		} catch (error) {
+			console.error("Save video error:", error);
 		}
 	};
 
 	const handleDeleteVideo = async (id) => {
-		if (!window.confirm("هل أنت تأكد من حذف هذا الفيديو؟")) return;
+		if (!window.confirm("هل أنت متأكد من حذف هذا الفيديو؟")) return;
 		try {
 			await axios.delete(`/curriculum/admin/videos/${id}`);
-			fetchUnits(selectedGrade);
-		} catch (err) {
-			console.error("Delete video error:", err);
+			await fetchUnits(selectedGrade);
+		} catch (error) {
+			console.error("Delete video error:", error);
 		}
 	};
 
+	const stats = units.reduce(
+		(total, unit) => {
+			total.lessons += unit.lessons?.length || 0;
+			total.videos +=
+				unit.lessons?.reduce(
+					(lessonsTotal, lesson) => lessonsTotal + (lesson.videos?.length || 0),
+					0,
+				) || 0;
+			return total;
+		},
+		{ lessons: 0, videos: 0 },
+	);
+
 	return (
-		<div className="flex flex-col gap-8 p-6">
-			{/* Header & Grade Selector */}
-			<div className="flex flex-col md:flex-row-reverse justify-between items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+		<div className="admin-curriculum-page" dir="rtl">
+			<header className="admin-curriculum-hero">
 				<div>
-					<h2 className="text-3xl font-bold text-[#006d35]">
-						إدارة المنهج والدروس
-					</h2>
-					<p className="text-lg text-gray-600">
-						إضافة وتعديل الوحدات والدروس ومقاطع الفيديو حسب المرحلة الدراسية
+					<span className="admin-curriculum-kicker">
+						<span className="material-symbols-outlined">tune</span>
+						استوديو المحتوى
+					</span>
+					<h1>إدارة المنهج والدروس</h1>
+					<p>
+						نظّم الوحدات، ابنِ مسار الدروس، وأدر مكتبة المحاضرات من مكان واحد.
 					</p>
 				</div>
+				<button
+					className="admin-curriculum-primary"
+					onClick={() => openUnitModal()}
+					type="button"
+				>
+					<span className="material-symbols-outlined">add</span>
+					وحدة جديدة
+				</button>
+			</header>
 
-				<div className="flex items-center gap-3">
-					<select
-						value={selectedGrade}
-						onChange={(e) => setSelectedGrade(e.target.value)}
-						className="p-3 border rounded-xl font-bold text-lg bg-[#e8ffee] text-[#006d35] focus:outline-none"
-					>
-						<option value="1HIGH">الصف الأول الثانوي</option>
-						<option value="2HIGH">الصف الثاني الثانوي</option>
-						<option value="3HIGH">الصف الثالث الثانوي</option>
-					</select>
-
-					<button
-						onClick={() => {
-							setEditingUnit(null);
-							setUnitForm({
-								title: "",
-								category: "",
-								description: "",
-								unit_number: units.length + 1,
-								icon: "biotech",
-								color_theme: "primary",
-							});
-							setShowUnitModal(true);
-						}}
-						className="bg-[#006d35] text-white px-6 py-3 rounded-xl font-bold text-lg shadow-md hover:bg-[#005226] transition-all flex items-center gap-2"
-					>
-						<span className="material-symbols-outlined">add</span>
-						<span>إضافة وحدة جديدة</span>
-					</button>
+			<section
+				className="admin-curriculum-toolbar"
+				aria-label="اختيار المرحلة الدراسية"
+			>
+				<div className="admin-curriculum-tabs" role="tablist">
+					{GRADES.map((grade) => (
+						<button
+							aria-selected={selectedGrade === grade.value}
+							className={selectedGrade === grade.value ? "is-active" : ""}
+							key={grade.value}
+							onClick={() => setSelectedGrade(grade.value)}
+							role="tab"
+							type="button"
+						>
+							<span className="admin-curriculum-tabs__long">{grade.label}</span>
+							<span className="admin-curriculum-tabs__short">
+								{grade.shortLabel}
+							</span>
+						</button>
+					))}
 				</div>
-			</div>
+				<div className="admin-curriculum-toolbar__context">
+					<span className="material-symbols-outlined">school</span>
+					{GRADES.find((grade) => grade.value === selectedGrade)?.label}
+				</div>
+			</section>
 
-			{/* Content Grid */}
+			<section className="admin-curriculum-stats" aria-label="إحصائيات المنهج">
+				<div className="admin-curriculum-stat admin-curriculum-stat--green">
+					<span className="material-symbols-outlined">view_quilt</span>
+					<div>
+						<strong>{units.length}</strong>
+						<span>وحدات دراسية</span>
+					</div>
+				</div>
+				<div className="admin-curriculum-stat admin-curriculum-stat--gold">
+					<span className="material-symbols-outlined">
+						format_list_bulleted
+					</span>
+					<div>
+						<strong>{stats.lessons}</strong>
+						<span>دروس مرتبة</span>
+					</div>
+				</div>
+				<div className="admin-curriculum-stat admin-curriculum-stat--coral">
+					<span className="material-symbols-outlined">play_circle</span>
+					<div>
+						<strong>{stats.videos}</strong>
+						<span>محاضرات مرفوعة</span>
+					</div>
+				</div>
+			</section>
+
 			{loading ? (
-				<div className="text-center py-16 text-2xl text-[#006d35] font-bold">
-					جاري تحميل بيانات المنهج...
+				<div className="admin-curriculum-state">
+					<span className="material-symbols-outlined">progress_activity</span>
+					جاري تحميل محتوى المرحلة...
 				</div>
 			) : units.length === 0 ? (
-				<div className="bg-white p-12 text-center text-xl text-gray-500 rounded-2xl border">
-					لا توجد وحدات دراسية حالياً لهذه المرحلة. اضغط على "إضافة وحدة جديدة"
-					للبدء.
+				<div className="admin-curriculum-empty">
+					<span className="material-symbols-outlined">library_add</span>
+					<h2>لا توجد وحدات لهذه المرحلة بعد</h2>
+					<p>ابدأ ببناء المنهج من خلال إضافة أول وحدة دراسية.</p>
+					<button
+						className="admin-curriculum-primary"
+						onClick={() => openUnitModal()}
+						type="button"
+					>
+						<span className="material-symbols-outlined">add</span>
+						إضافة أول وحدة
+					</button>
 				</div>
 			) : (
-				<div className="flex flex-col gap-6">
-					{units.map((unit) => (
-						<div
+				<section
+					className="admin-curriculum-units"
+					aria-label="الوحدات الدراسية"
+				>
+					{units.map((unit, index) => (
+						<article
+							className={`admin-unit-card admin-unit-card--${unit.color_theme || "primary"}`}
 							key={unit.id}
-							className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 flex flex-col gap-6"
+							style={{ "--unit-index": index }}
 						>
-							{/* Unit Header */}
-							<div className="flex justify-between items-center bg-[#e1fae7] p-4 rounded-xl border border-[#00e475]/30">
-								<div className="flex items-center gap-3">
-									<span className="material-symbols-outlined text-3xl text-[#006d35]">
+							<header className="admin-unit-card__header">
+								<div className="admin-unit-card__identity">
+									<span className="admin-unit-card__number">
+										{String(unit.unit_number).padStart(2, "0")}
+									</span>
+									<span className="admin-unit-card__icon material-symbols-outlined">
 										{unit.icon || "biotech"}
 									</span>
 									<div>
-										<h3 className="text-2xl font-bold text-[#0a2014]">
-											الوحدة {unit.unit_number}: {unit.title}
-										</h3>
-										<span className="text-sm font-semibold text-[#825500] bg-[#ffddb3] px-3 py-1 rounded-full inline-block mt-1">
-											{unit.category}
+										<span className="admin-unit-card__eyebrow">
+											الوحدة الدراسية
+										</span>
+										<h2>{unit.title}</h2>
+										<span className="admin-unit-card__category">
+											{unit.category || "عام"}
 										</span>
 									</div>
 								</div>
-
-								<div className="flex items-center gap-2">
+								<div className="admin-unit-card__actions">
 									<button
-										onClick={() => {
-											setSelectedUnitId(unit.id);
-											setEditingLesson(null);
-											setLessonForm({
-												title: "",
-												description: "",
-												lesson_number: (unit.lessons?.length || 0) + 1,
-											});
-											setShowLessonModal(true);
-										}}
-										className="bg-[#00e676] text-[#00612e] px-4 py-2 rounded-lg font-bold hover:bg-[#62ff96] transition-all flex items-center gap-1"
+										className="admin-curriculum-secondary"
+										onClick={() => openLessonModal(unit)}
+										type="button"
 									>
-										<span className="material-symbols-outlined text-xl">
-											add
-										</span>
-										إضافة درس
+										<span className="material-symbols-outlined">add</span> درس
 									</button>
 									<button
-										onClick={() => {
-											setEditingUnit(unit);
-											setUnitForm(unit);
-											setShowUnitModal(true);
-										}}
-										className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+										aria-label="تعديل الوحدة"
+										className="admin-curriculum-icon-button"
+										onClick={() => openUnitModal(unit)}
+										type="button"
 									>
 										<span className="material-symbols-outlined">edit</span>
 									</button>
 									<button
+										aria-label="حذف الوحدة"
+										className="admin-curriculum-icon-button is-danger"
 										onClick={() => handleDeleteUnit(unit.id)}
-										className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+										type="button"
 									>
 										<span className="material-symbols-outlined">delete</span>
 									</button>
 								</div>
-							</div>
+							</header>
 
-							{/* Lessons inside Unit */}
-							<div className="flex flex-col gap-4 pr-4 border-r-4 border-[#006d35]/20">
-								{unit.lessons?.map((lesson) => (
-									<div
-										key={lesson.id}
-										className="bg-[#f8fafc] p-4 rounded-xl border flex flex-col gap-3"
-									>
-										<div className="flex justify-between items-center">
-											<h4 className="text-xl font-bold text-[#0a2014]">
-												الدرس {lesson.lesson_number}: {lesson.title}
-											</h4>
-											<div className="flex items-center gap-2">
-												<button
-													onClick={() => {
-														setSelectedLessonId(lesson.id);
-														setEditingVideo(null);
-														setVideoForm({
-															title: "",
-															duration: "30:00",
-															video_url: "",
-															pdf_url: "",
-															video_order: (lesson.videos?.length || 0) + 1,
-														});
-														setShowVideoModal(true);
-													}}
-													className="bg-[#006d35] text-white px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-[#005226]"
-												>
-													+ إضافة فيديو
-												</button>
-												<button
-													onClick={() => {
-														setEditingLesson(lesson);
-														setLessonForm(lesson);
-														setShowLessonModal(true);
-													}}
-													className="text-blue-600 hover:bg-blue-50 p-1 rounded"
-												>
-													<span className="material-symbols-outlined text-lg">
-														edit
-													</span>
-												</button>
-												<button
-													onClick={() => handleDeleteLesson(lesson.id)}
-													className="text-red-600 hover:bg-red-50 p-1 rounded"
-												>
-													<span className="material-symbols-outlined text-lg">
-														delete
-													</span>
-												</button>
-											</div>
-										</div>
+							<div className="admin-unit-card__body">
+								{unit.description ? (
+									<p className="admin-unit-card__description">
+										{unit.description}
+									</p>
+								) : null}
+								<div className="admin-unit-card__section-heading">
+									<div>
+										<span className="material-symbols-outlined">
+											format_list_bulleted
+										</span>
+										<h3>مسار الدروس</h3>
+										<span className="admin-unit-card__count">
+											{unit.lessons?.length || 0}
+										</span>
+									</div>
+									<span>المحاضرات مرتبطة بكل درس</span>
+								</div>
 
-										{/* Videos List */}
-										<div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
-											{lesson.videos?.map((vid) => (
-												<div
-													key={vid.id}
-													className="bg-white p-3 rounded-lg border flex justify-between items-center shadow-xs"
-												>
-													<div className="flex items-center gap-2">
-														<span className="material-symbols-outlined text-[#006d35]">
-															play_circle
-														</span>
-														<div>
-															<div className="font-bold text-gray-800">
-																{vid.title}
-															</div>
-															<div className="text-xs text-gray-500">
-																مدة الفيديو: {vid.duration}
-															</div>
-														</div>
-													</div>
-													<div className="flex items-center gap-1">
-														<button
-															onClick={() => {
-																setEditingVideo(vid);
-																setVideoForm(vid);
-																setShowVideoModal(true);
-															}}
-															className="text-blue-600 hover:bg-blue-50 p-1 rounded"
-														>
-															<span className="material-symbols-outlined text-sm">
-																edit
-															</span>
-														</button>
-														<button
-															onClick={() => handleDeleteVideo(vid.id)}
-															className="text-red-600 hover:bg-red-50 p-1 rounded"
-														>
-															<span className="material-symbols-outlined text-sm">
-																delete
-															</span>
-														</button>
+								{unit.lessons?.length ? (
+									<div className="admin-lessons-list">
+										{unit.lessons.map((lesson) => (
+											<div className="admin-lesson-row" key={lesson.id}>
+												<div className="admin-lesson-row__main">
+													<span className="admin-lesson-row__number">
+														{String(lesson.lesson_number).padStart(2, "0")}
+													</span>
+													<div>
+														<h4>{lesson.title}</h4>
+														{lesson.description ? (
+															<p>{lesson.description}</p>
+														) : null}
 													</div>
 												</div>
-											))}
-										</div>
+												<div className="admin-lesson-row__actions">
+													<span className="admin-lesson-row__video-count">
+														<span className="material-symbols-outlined">
+															play_circle
+														</span>
+														{lesson.videos?.length || 0} محاضرات
+													</span>
+													<button
+														className="admin-curriculum-secondary is-dark"
+														onClick={() => openVideoModal(lesson)}
+														type="button"
+													>
+														<span className="material-symbols-outlined">
+															add
+														</span>{" "}
+														محاضرة
+													</button>
+													<button
+														aria-label="تعديل الدرس"
+														className="admin-curriculum-icon-button"
+														onClick={() => openLessonModal(unit, lesson)}
+														type="button"
+													>
+														<span className="material-symbols-outlined">
+															edit
+														</span>
+													</button>
+													<button
+														aria-label="حذف الدرس"
+														className="admin-curriculum-icon-button is-danger"
+														onClick={() => handleDeleteLesson(lesson.id)}
+														type="button"
+													>
+														<span className="material-symbols-outlined">
+															delete
+														</span>
+													</button>
+												</div>
+
+												{lesson.videos?.length ? (
+													<div className="admin-video-list">
+														{lesson.videos.map((video) => (
+															<div className="admin-video-item" key={video.id}>
+																<span className="material-symbols-outlined">
+																	play_circle
+																</span>
+																<div>
+																	<strong>{video.title}</strong>
+																	<small>
+																		{video.duration || "بدون مدة"}
+																		{video.pdf_url ? " • PDF مرفق" : ""}
+																	</small>
+																</div>
+																<div className="admin-video-item__actions">
+																	<button
+																		aria-label="تعديل المحاضرة"
+																		className="admin-curriculum-icon-button"
+																		onClick={() =>
+																			openVideoModal(lesson, video)
+																		}
+																		type="button"
+																	>
+																		<span className="material-symbols-outlined">
+																			edit
+																		</span>
+																	</button>
+																	<button
+																		aria-label="حذف المحاضرة"
+																		className="admin-curriculum-icon-button is-danger"
+																		onClick={() => handleDeleteVideo(video.id)}
+																		type="button"
+																	>
+																		<span className="material-symbols-outlined">
+																			delete
+																		</span>
+																	</button>
+																</div>
+															</div>
+														))}
+													</div>
+												) : null}
+											</div>
+										))}
 									</div>
-								))}
+								) : (
+									<div className="admin-lesson-empty">
+										<span className="material-symbols-outlined">
+											playlist_add
+										</span>
+										<span>لم تتم إضافة دروس لهذه الوحدة بعد.</span>
+										<button
+											className="admin-curriculum-text-button"
+											onClick={() => openLessonModal(unit)}
+											type="button"
+										>
+											إضافة درس الآن
+										</button>
+									</div>
+								)}
 							</div>
-						</div>
+						</article>
 					))}
-				</div>
+				</section>
 			)}
 
-			{/* Unit Modal */}
-			{showUnitModal && (
-				<div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-					<div className="bg-white p-6 rounded-2xl w-full max-w-lg flex flex-col gap-4">
-						<h3 className="text-2xl font-bold text-[#006d35]">
-							{editingUnit ? "تعديل الوحدة" : "إضافة وحدة جديدة"}
-						</h3>
-						<form onSubmit={handleSaveUnit} className="flex flex-col gap-4">
-							<input
-								type="text"
-								placeholder="عنوان الوحدة (مثال: الأساس الجزيئي للوراثة)"
-								value={unitForm.title}
-								onChange={(e) =>
-									setUnitForm({ ...unitForm, title: e.target.value })
-								}
-								required
-								className="p-3 border rounded-xl text-lg"
-							/>
-							<input
-								type="text"
-								placeholder="التصنيف (مثال: علم الأحياء الجزيئي)"
-								value={unitForm.category}
-								onChange={(e) =>
-									setUnitForm({ ...unitForm, category: e.target.value })
-								}
-								required
-								className="p-3 border rounded-xl text-lg"
-							/>
-							<textarea
-								placeholder="وصف الوحدة"
-								value={unitForm.description}
-								onChange={(e) =>
-									setUnitForm({ ...unitForm, description: e.target.value })
-								}
-								rows={3}
-								className="p-3 border rounded-xl text-lg"
-							></textarea>
-							<div className="flex gap-4">
-								<button
-									type="submit"
-									className="bg-[#006d35] text-white px-6 py-3 rounded-xl font-bold text-lg flex-1"
-								>
-									حفظ
-								</button>
-								<button
-									type="button"
-									onClick={() => setShowUnitModal(false)}
-									className="bg-gray-200 text-gray-800 px-6 py-3 rounded-xl font-bold text-lg"
-								>
-									إلغاء
-								</button>
-							</div>
-						</form>
-					</div>
-				</div>
-			)}
-
-			{/* Lesson Modal */}
-			{showLessonModal && (
-				<div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-					<div className="bg-white p-6 rounded-2xl w-full max-w-lg flex flex-col gap-4">
-						<h3 className="text-2xl font-bold text-[#006d35]">
-							{editingLesson ? "تعديل الدرس" : "إضافة درس جديد"}
-						</h3>
-						<form onSubmit={handleSaveLesson} className="flex flex-col gap-4">
-							<input
-								type="text"
-								placeholder="عنوان الدرس"
-								value={lessonForm.title}
-								onChange={(e) =>
-									setLessonForm({ ...lessonForm, title: e.target.value })
-								}
-								required
-								className="p-3 border rounded-xl text-lg"
-							/>
-							<textarea
-								placeholder="وصف الدرس"
-								value={lessonForm.description}
-								onChange={(e) =>
-									setLessonForm({ ...lessonForm, description: e.target.value })
-								}
-								rows={2}
-								className="p-3 border rounded-xl text-lg"
-							></textarea>
-							<div className="flex gap-4">
-								<button
-									type="submit"
-									className="bg-[#006d35] text-white px-6 py-3 rounded-xl font-bold text-lg flex-1"
-								>
-									حفظ
-								</button>
-								<button
-									type="button"
-									onClick={() => setShowLessonModal(false)}
-									className="bg-gray-200 text-gray-800 px-6 py-3 rounded-xl font-bold text-lg"
-								>
-									إلغاء
-								</button>
-							</div>
-						</form>
-					</div>
-				</div>
-			)}
-
-			{/* Video Modal */}
-			{showVideoModal && (
-				<div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-					<div className="bg-white p-6 rounded-2xl w-full max-w-lg flex flex-col gap-4">
-						<h3 className="text-2xl font-bold text-[#006d35]">
-							{editingVideo ? "تعديل الفيديو" : "إضافة فيديو جديد"}
-						</h3>
-						<form onSubmit={handleSaveVideo} className="flex flex-col gap-4">
-							<input
-								type="text"
-								placeholder="عنوان الفيديو"
-								value={videoForm.title}
-								onChange={(e) =>
-									setVideoForm({ ...videoForm, title: e.target.value })
-								}
-								required
-								className="p-3 border rounded-xl text-lg"
-							/>
-							<input
-								type="text"
-								placeholder="مدة الفيديو (مثال: 45:00)"
-								value={videoForm.duration}
-								onChange={(e) =>
-									setVideoForm({ ...videoForm, duration: e.target.value })
-								}
-								required
-								className="p-3 border rounded-xl text-lg"
-							/>
-
-							<div className="flex flex-col gap-2">
-								<label className="font-bold text-gray-700">
-									رابط الفيديو أو رفعه من الجهاز:
-								</label>
+			{showUnitModal ? (
+				<AdminModal
+					eyebrow="إعداد الوحدة"
+					title={editingUnit ? "تعديل الوحدة" : "إضافة وحدة جديدة"}
+					onClose={() => setShowUnitModal(false)}
+				>
+					<form className="admin-curriculum-form" onSubmit={handleSaveUnit}>
+						<div className="admin-curriculum-form__grid">
+							<label>
+								عنوان الوحدة
 								<input
-									type="text"
-									placeholder="https://... أو مسار /uploads/video.mp4"
-									value={videoForm.video_url}
-									onChange={(e) =>
-										setVideoForm({ ...videoForm, video_url: e.target.value })
-									}
 									required
-									className="p-3 border rounded-xl text-lg"
-								/>
-								<input
-									type="file"
-									accept="video/*"
-									onChange={(e) => handleFileUpload(e, "video_url")}
-									className="text-sm"
-								/>
-							</div>
-
-							<div className="flex flex-col gap-2">
-								<label className="font-bold text-gray-700">
-									ملف ملخص PDF (اختياري):
-								</label>
-								<input
-									type="text"
-									placeholder="مسار PDF"
-									value={videoForm.pdf_url}
-									onChange={(e) =>
-										setVideoForm({ ...videoForm, pdf_url: e.target.value })
+									value={unitForm.title}
+									onChange={(event) =>
+										setUnitForm({ ...unitForm, title: event.target.value })
 									}
-									className="p-3 border rounded-xl text-lg"
+									placeholder="مثال: الأساس الجزيئي للوراثة"
 								/>
+							</label>
+							<label>
+								التصنيف
 								<input
-									type="file"
-									accept="application/pdf"
-									onChange={(e) => handleFileUpload(e, "pdf_url")}
-									className="text-sm"
+									required
+									value={unitForm.category}
+									onChange={(event) =>
+										setUnitForm({ ...unitForm, category: event.target.value })
+									}
+									placeholder="مثال: علم الوراثة"
 								/>
-							</div>
-
-							{uploadingFile && (
-								<div className="text-blue-600 font-bold">جاري رفع الملف...</div>
-							)}
-
-							<div className="flex gap-4 mt-2">
-								<button
-									type="submit"
-									disabled={uploadingFile}
-									className="bg-[#006d35] text-white px-6 py-3 rounded-xl font-bold text-lg flex-1"
+							</label>
+							<label>
+								رقم الوحدة
+								<input
+									min="1"
+									type="number"
+									value={unitForm.unit_number}
+									onChange={(event) =>
+										setUnitForm({
+											...unitForm,
+											unit_number: Number(event.target.value),
+										})
+									}
+								/>
+							</label>
+							<label>
+								الأيقونة
+								<input
+									value={unitForm.icon}
+									onChange={(event) =>
+										setUnitForm({ ...unitForm, icon: event.target.value })
+									}
+									placeholder="biotech"
+								/>
+							</label>
+							<label>
+								لون الوحدة
+								<select
+									value={unitForm.color_theme}
+									onChange={(event) =>
+										setUnitForm({
+											...unitForm,
+											color_theme: event.target.value,
+										})
+									}
 								>
-									حفظ الفيديو
-								</button>
-								<button
-									type="button"
-									onClick={() => setShowVideoModal(false)}
-									className="bg-gray-200 text-gray-800 px-6 py-3 rounded-xl font-bold text-lg"
-								>
-									إلغاء
-								</button>
+									<option value="primary">أخضر</option>
+									<option value="secondary">ذهبي</option>
+									<option value="tertiary">مرجاني</option>
+								</select>
+							</label>
+						</div>
+						<label>
+							وصف الوحدة
+							<textarea
+								rows={4}
+								value={unitForm.description}
+								onChange={(event) =>
+									setUnitForm({ ...unitForm, description: event.target.value })
+								}
+								placeholder="أضف وصفاً مختصراً يظهر للطلاب..."
+							/>
+						</label>
+						<div className="admin-curriculum-form__actions">
+							<button className="admin-curriculum-primary" type="submit">
+								حفظ الوحدة
+							</button>
+							<button
+								className="admin-curriculum-cancel"
+								onClick={() => setShowUnitModal(false)}
+								type="button"
+							>
+								إلغاء
+							</button>
+						</div>
+					</form>
+				</AdminModal>
+			) : null}
+
+			{showLessonModal ? (
+				<AdminModal
+					eyebrow="بناء المسار"
+					title={editingLesson ? "تعديل الدرس" : "إضافة درس جديد"}
+					onClose={() => setShowLessonModal(false)}
+				>
+					<form className="admin-curriculum-form" onSubmit={handleSaveLesson}>
+						<label>
+							عنوان الدرس
+							<input
+								required
+								value={lessonForm.title}
+								onChange={(event) =>
+									setLessonForm({ ...lessonForm, title: event.target.value })
+								}
+								placeholder="مثال: تركيب الحمض النووي"
+							/>
+						</label>
+						<label>
+							رقم الدرس
+							<input
+								min="1"
+								type="number"
+								value={lessonForm.lesson_number}
+								onChange={(event) =>
+									setLessonForm({
+										...lessonForm,
+										lesson_number: Number(event.target.value),
+									})
+								}
+							/>
+						</label>
+						<label>
+							وصف الدرس
+							<textarea
+								rows={4}
+								value={lessonForm.description}
+								onChange={(event) =>
+									setLessonForm({
+										...lessonForm,
+										description: event.target.value,
+									})
+								}
+								placeholder="ما الذي سيتعلمه الطالب في هذا الدرس؟"
+							/>
+						</label>
+						<div className="admin-curriculum-form__actions">
+							<button className="admin-curriculum-primary" type="submit">
+								حفظ الدرس
+							</button>
+							<button
+								className="admin-curriculum-cancel"
+								onClick={() => setShowLessonModal(false)}
+								type="button"
+							>
+								إلغاء
+							</button>
+						</div>
+					</form>
+				</AdminModal>
+			) : null}
+
+			{showVideoModal ? (
+				<AdminModal
+					eyebrow="مكتبة المحاضرات"
+					title={editingVideo ? "تعديل المحاضرة" : "إضافة محاضرة جديدة"}
+					onClose={() => setShowVideoModal(false)}
+					wide
+				>
+					<form className="admin-curriculum-form" onSubmit={handleSaveVideo}>
+						<div className="admin-curriculum-form__grid">
+							<label>
+								عنوان المحاضرة
+								<input
+									required
+									value={videoForm.title}
+									onChange={(event) =>
+										setVideoForm({ ...videoForm, title: event.target.value })
+									}
+									placeholder="مثال: شرح تركيب DNA"
+								/>
+							</label>
+							<label>
+								المدة
+								<input
+									required
+									value={videoForm.duration}
+									onChange={(event) =>
+										setVideoForm({ ...videoForm, duration: event.target.value })
+									}
+									placeholder="45:00"
+								/>
+							</label>
+							<label>
+								ترتيب المحاضرة
+								<input
+									min="1"
+									type="number"
+									value={videoForm.video_order}
+									onChange={(event) =>
+										setVideoForm({
+											...videoForm,
+											video_order: Number(event.target.value),
+										})
+									}
+								/>
+							</label>
+						</div>
+						<label>
+							رابط الفيديو
+							<input
+								required
+								value={videoForm.video_url}
+								onChange={(event) =>
+									setVideoForm({ ...videoForm, video_url: event.target.value })
+								}
+								placeholder="https://... أو مسار /uploads/video.mp4"
+							/>
+						</label>
+						<div className="admin-upload-field">
+							<span>رفع فيديو من الجهاز</span>
+							<input
+								accept="video/*"
+								onChange={(event) => handleFileUpload(event, "video_url")}
+								type="file"
+							/>
+						</div>
+						<label>
+							رابط ملخص PDF
+							<input
+								value={videoForm.pdf_url}
+								onChange={(event) =>
+									setVideoForm({ ...videoForm, pdf_url: event.target.value })
+								}
+								placeholder="مسار ملف PDF اختياري"
+							/>
+						</label>
+						<div className="admin-upload-field">
+							<span>رفع ملخص PDF</span>
+							<input
+								accept="application/pdf"
+								onChange={(event) => handleFileUpload(event, "pdf_url")}
+								type="file"
+							/>
+						</div>
+						{uploadingFile ? (
+							<div className="admin-upload-status">
+								<span className="material-symbols-outlined">
+									progress_activity
+								</span>
+								جاري رفع الملف...
 							</div>
-						</form>
-					</div>
-				</div>
-			)}
+						) : null}
+						<div className="admin-curriculum-form__actions">
+							<button
+								className="admin-curriculum-primary"
+								disabled={uploadingFile}
+								type="submit"
+							>
+								حفظ المحاضرة
+							</button>
+							<button
+								className="admin-curriculum-cancel"
+								onClick={() => setShowVideoModal(false)}
+								type="button"
+							>
+								إلغاء
+							</button>
+						</div>
+					</form>
+				</AdminModal>
+			) : null}
 		</div>
 	);
 };
