@@ -86,7 +86,7 @@ const TestImageViewer = ({ testId }) => {
 				{images.length > 0 && (
 					<img
 						src={
-							`${import.meta.env.VITE_STATIC_BASE_URL || "https://studentportal.8bitsolutions.net"}/` +
+							`${import.meta.env.VITE_STATIC_BASE_URL || "https://marwahashem.com"}/` +
 							(images[currentIndex].image_url ||
 								images[currentIndex].image_path)
 						}

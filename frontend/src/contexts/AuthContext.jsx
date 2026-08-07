@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 // Set global API base URL for all axios requests
-const API_BASE_URL = "https://studentportal.8bitsolutions.net/api";
+const API_BASE_URL = "https://marwahashem.com/api";
 axios.defaults.baseURL = API_BASE_URL;
 console.log("✅ AuthContext loaded with API_BASE_URL:", API_BASE_URL);
 

@@ -4,7 +4,7 @@
 
 This guide explains how to deploy the Student Portal application to Dokploy.
 
-**Domain:** `studentportal.8bitsolutions.net`
+**Domain:** `marwahashem.com`
 
 ## Architecture
 
@@ -50,7 +50,7 @@ docker exec -it <postgres-container-id> psql -U postgres -d studentportal < /bac
    PORT=3001
    NODE_ENV=production
    GRADING_SCRIPT_DIR=/app/grading_service
-   CORS_ORIGIN=https://studentportal.8bitsolutions.net
+   CORS_ORIGIN=https://marwahashem.com
    ```
 
 5. **Volumes:**
@@ -73,23 +73,23 @@ docker exec -it <postgres-container-id> psql -U postgres -d studentportal < /bac
 
 ## Step 4: Configure Domain & Routing
 
-### For `studentportal.8bitsolutions.net`:
+### For `marwahashem.com`:
 
 1. Go to frontend application → **Domains**
-2. Add domain: `studentportal.8bitsolutions.net`
+2. Add domain: `marwahashem.com`
 3. Configure routing rules in Traefik:
 
 **Method 1: Using Traefik Labels**
 
 Add to backend application:
 ```yaml
-traefik.http.routers.backend.rule=Host(`studentportal.8bitsolutions.net`) && (PathPrefix(`/api`) || PathPrefix(`/uploads`) || PathPrefix(`/grading_service`))
+traefik.http.routers.backend.rule=Host(`marwahashem.com`) && (PathPrefix(`/api`) || PathPrefix(`/uploads`) || PathPrefix(`/grading_service`))
 traefik.http.routers.backend.priority=100
 ```
 
 Add to frontend application:
 ```yaml
-traefik.http.routers.frontend.rule=Host(`studentportal.8bitsolutions.net`)
+traefik.http.routers.frontend.rule=Host(`marwahashem.com`)
 traefik.http.routers.frontend.priority=1
 ```
 

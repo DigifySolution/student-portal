@@ -305,7 +305,7 @@ const TestManagement = () => {
 		try {
 			const API_BASE =
 				import.meta.env.VITE_STATIC_BASE_URL ||
-				"https://studentportal.8bitsolutions.net";
+				"https://marwahashem.com";
 
 			const sortedImages = [...test.images].sort(
 				(a, b) => (a.display_order || 0) - (b.display_order || 0),
