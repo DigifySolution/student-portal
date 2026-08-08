@@ -136,14 +136,42 @@
 	white-space: nowrap;
 }
 
+/*
+ * Single source of truth for the table geometry. Both the sticky header
+ * strip and every .student-card row consume this variable, so columns can
+ * never drift apart.
+ */
 .student-table-wrap {
+	--student-cols: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr)
+		minmax(0, 0.9fr) minmax(0, 0.9fr) 52px;
 	width: 100%;
+}
+
+/* Column headers only make sense once the row is actually a table. */
+.student-table-head {
+	display: none;
+}
+
+@media (min-width: 1000px) {
+	.student-table-head {
+		display: grid;
+		grid-template-columns: var(--student-cols);
+		align-items: center;
+		gap: 0 16px;
+		margin-bottom: 8px;
+		padding: 0 18px 9px;
+		border-bottom: 1px solid #dfece1;
+		color: #85978a;
+		font-size: 0.67rem;
+		font-weight: 800;
+		letter-spacing: 0.05em;
+	}
 }
 
 .student-list {
 	display: flex;
 	flex-direction: column;
-	gap: 10px;
+	gap: 8px;
 	width: 100%;
 	max-width: none;
 	margin: 0;
@@ -299,9 +327,6 @@
 	}
 	.results-count {
 		text-align: center;
-	}
-	.student-list {
-		grid-template-columns: 1fr;
 	}
 	.pagination-info {
 		width: 100%;

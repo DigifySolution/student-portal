@@ -1,126 +1,75 @@
+/*
+ * Student record row.
+ *
+ * Mobile-first: a stacked card. From 1000px up it becomes a table row whose
+ * columns are driven by ONE shared grid template (see .student-table-head in
+ * StudentManagement.css) so every cell lines up with its column header.
+ *
+ * Rule order matters here: all base rules come first, then the single
+ * desktop media query LAST, so it always wins the cascade.
+ */
+
+/* ── Base card (mobile) ── */
+
 .student-card {
 	position: relative;
 	display: grid;
-	grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.55fr) auto;
+	grid-template-columns: minmax(0, 1fr) auto;
+	grid-template-areas:
+		"header actions"
+		"body   body";
 	align-items: center;
-	gap: 20px;
+	gap: 14px;
 	width: 100%;
 	min-width: 0;
-	min-height: 118px;
-	padding: 18px 20px;
-	border: 1px solid rgba(255, 255, 255, 0.72);
-	border-radius: 18px;
-	background: rgba(255, 255, 255, 0.78);
-	box-shadow: 0 8px 24px rgba(0, 109, 53, 0.07);
-	backdrop-filter: blur(16px);
-	-webkit-backdrop-filter: blur(16px);
-	animation: student-card-rise 0.45s ease both;
+	padding: 16px 18px;
+	border: 1px solid rgba(0, 109, 53, 0.1);
+	border-radius: 16px;
+	background: #fff;
+	box-shadow: 0 4px 14px rgba(0, 109, 53, 0.06);
 	transition:
-		transform 0.25s ease,
-		box-shadow 0.25s ease,
-		border-color 0.25s ease;
-}
-
-/* Column header strip: hidden until the layout is wide enough to be a table. */
-.student-table-head {
-	display: none;
-}
-
-/*
- * Table geometry shared with .student-table-head so every column stays
- * aligned down the page.
- */
-@media (min-width: 1000px) {
-	.student-table-head,
-	.student-card {
-		display: grid;
-		grid-template-columns:
-			minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr)
-			minmax(0, 1fr) minmax(0, 1fr) 56px;
-		align-items: center;
-		gap: 0 18px;
-	}
-
-	.student-table-head {
-		position: sticky;
-		top: 76px;
-		z-index: 30;
-		margin-bottom: 2px;
-		padding: 0 20px 10px;
-		border-bottom: 1px solid #dfece1;
-		background: #f4fbf5;
-		color: #7c8f81;
-		font-size: 0.68rem;
-		font-weight: 800;
-		letter-spacing: 0.05em;
-		text-transform: uppercase;
-	}
-
-	.student-card {
-		min-height: 76px;
-		padding: 12px 20px;
-		border-radius: 14px;
-	}
-
-	.student-card::before {
-		top: 12px;
-		bottom: 12px;
-	}
-
-	.student-card-header {
-		padding-inline-end: 0;
-		border-inline-end: 0;
-	}
-
-	/* Cells are laid out by the parent row, not nested in their own grid. */
-	.student-card-body {
-		display: contents;
-	}
-
-	.student-card-body p strong {
-		display: none;
-	}
+		box-shadow 0.2s ease,
+		border-color 0.2s ease;
 }
 
 .student-card:hover {
-	transform: translateY(-3px);
-	border-color: rgba(0, 169, 82, 0.35);
-	box-shadow: 0 16px 34px rgba(0, 109, 53, 0.13);
+	border-color: rgba(0, 169, 82, 0.4);
+	box-shadow: 0 10px 26px rgba(0, 109, 53, 0.11);
 }
 
+/* Accent rail on the inline-start edge (RTL: right). */
 .student-card::before {
 	content: "";
 	position: absolute;
-	top: 20px;
-	bottom: 20px;
-	right: 0;
+	top: 14px;
+	bottom: 14px;
+	inset-inline-start: 0;
 	width: 3px;
-	border-radius: 4px 0 0 4px;
+	border-radius: 0 4px 4px 0;
 	background: linear-gradient(#00e676, #006d35);
 }
 
-/* ── Identity rail ── */
+/* ── Identity ── */
 
 .student-card-header {
+	grid-area: header;
 	display: flex;
 	align-items: center;
 	min-width: 0;
 	margin: 0;
-	padding-inline-end: 20px;
-	border-inline-end: 1px solid #e8f1e9;
 }
 
 .student-card-header h3 {
 	display: flex;
 	min-width: 0;
 	flex-direction: column;
-	gap: 5px;
+	gap: 4px;
 	margin: 0;
 	color: #10271b;
-	font-size: 1.02rem;
+	font-size: 0.98rem;
 	font-weight: 800;
 	line-height: 1.35;
-	word-break: break-word;
+	overflow-wrap: anywhere;
 }
 
 .student-id {
@@ -136,6 +85,7 @@
 	display: inline-flex;
 	width: 21px;
 	height: 21px;
+	flex: 0 0 auto;
 	align-items: center;
 	justify-content: center;
 	padding: 2px;
@@ -153,45 +103,46 @@
 	color: #006d35;
 }
 
-/* ── Data columns ── */
+/* ── Data cells ── */
 
 .student-card-body {
+	grid-area: body;
 	display: grid;
-	grid-template-columns: repeat(4, minmax(0, 1fr));
+	grid-template-columns: repeat(2, minmax(0, 1fr));
 	align-items: center;
-	gap: 14px;
+	gap: 12px;
 	min-width: 0;
 	margin: 0;
-	padding: 0;
-	border: 0;
+	padding-top: 13px;
+	border-top: 1px solid #eef4ef;
 }
 
 .student-card-body p {
 	display: flex;
 	min-width: 0;
 	flex-direction: column;
-	gap: 3px;
+	gap: 2px;
 	margin: 0;
 	color: #31543c;
-	font-size: 0.8rem;
+	font-size: 0.82rem;
 	font-weight: 700;
 	line-height: 1.4;
 	overflow-wrap: anywhere;
 }
 
 .student-card-body p strong {
-	color: #85978a;
-	font-size: 0.65rem;
+	color: #8a9c8e;
+	font-size: 0.64rem;
 	font-weight: 800;
 	letter-spacing: 0.04em;
-	text-transform: uppercase;
 }
 
 /* ── Actions ── */
 
 .student-card-actions-menu {
+	grid-area: actions;
 	position: relative;
-	z-index: 80;
+	z-index: 5;
 	display: flex;
 	flex: 0 0 auto;
 	align-items: center;
@@ -200,22 +151,23 @@
 
 .menu-trigger-btn {
 	display: inline-flex;
-	width: 36px;
-	height: 36px;
+	width: 34px;
+	height: 34px;
 	align-items: center;
 	justify-content: center;
-	padding-bottom: 5px;
+	padding: 0 0 5px;
 	border: 1px solid #d4e5d7;
 	border-radius: 10px;
 	background: #f5fbf6;
 	color: #66816d;
-	font-size: 21px;
+	font-size: 20px;
 	line-height: 1;
 	cursor: pointer;
 	transition: 0.2s ease;
 }
 
-.menu-trigger-btn:hover {
+.menu-trigger-btn:hover,
+.menu-trigger-btn[aria-expanded="true"] {
 	border-color: #8bc79a;
 	background: #eaf7ed;
 	color: #006d35;
@@ -223,20 +175,18 @@
 
 .student-actions-dropdown {
 	position: absolute;
-	top: auto;
-	bottom: calc(100% + 8px);
-	right: 0;
-	z-index: 120;
+	top: calc(100% + 6px);
+	inset-inline-end: 0;
+	z-index: 200;
 	display: flex;
-	min-width: 210px;
+	min-width: 208px;
 	flex-direction: column;
-	gap: 3px;
-	padding: 7px;
+	gap: 2px;
+	padding: 6px;
 	border: 1px solid #dbeadd;
-	border-radius: 13px;
-	background: #fbfffc;
-	box-shadow: 0 18px 38px rgba(0, 45, 20, 0.18);
-	animation: student-menu-in 0.16s ease both;
+	border-radius: 12px;
+	background: #fff;
+	box-shadow: 0 16px 36px rgba(0, 45, 20, 0.18);
 }
 
 .dropdown-action-btn {
@@ -248,7 +198,7 @@
 	font-family: inherit;
 	font-size: 0.78rem;
 	font-weight: 700;
-	text-align: right;
+	text-align: start;
 	cursor: pointer;
 }
 
@@ -265,78 +215,63 @@
 	background: #fff0ed;
 }
 
-/* Lift the whole row while its menu is open so neighbours cannot overlap it. */
+/*
+ * Raise the row that owns an open menu above its siblings, otherwise the
+ * next row's background paints over the dropdown.
+ */
 .student-card:has(.student-actions-dropdown) {
-	z-index: 60;
+	z-index: 100;
 }
 
-@keyframes student-card-rise {
-	from {
-		opacity: 0;
-		transform: translateY(12px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
-}
+/* ── Desktop table row (must stay last) ── */
 
-@keyframes student-menu-in {
-	from {
-		opacity: 0;
-		transform: translateY(6px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
-}
-
-@media (max-width: 999px) {
+@media (min-width: 1000px) {
 	.student-card {
-		grid-template-columns: minmax(0, 1fr) auto;
-		grid-template-areas:
-			"header actions"
-			"body   body";
-		gap: 14px;
+		grid-template-columns: var(--student-cols);
+		grid-template-areas: none;
+		gap: 0 16px;
+		min-height: 68px;
+		padding: 10px 18px;
+		border-radius: 12px;
 	}
 
-	.student-card-header {
-		grid-area: header;
-		padding-inline-end: 0;
-		border-inline-end: 0;
+	.student-card::before {
+		top: 10px;
+		bottom: 10px;
 	}
 
-	.student-card-actions-menu {
-		grid-area: actions;
+	.student-card-header,
+	.student-card-body,
+	.student-card-actions-menu,
+	.student-card-body p {
+		grid-area: auto;
 	}
 
+	/*
+	 * The four <p> cells are promoted to row-level grid items so they align
+	 * with the shared column template. `display: contents` is deliberately
+	 * avoided: it removes the wrapper from the a11y tree in some engines.
+	 */
 	.student-card-body {
-		grid-area: body;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		padding-top: 14px;
-		border-top: 1px solid #edf3ed;
-	}
-}
-
-@media (max-width: 460px) {
-	.student-card-body {
-		grid-template-columns: 1fr;
-		gap: 9px;
+		display: grid;
+		grid-column: 2 / 6;
+		grid-template-columns: subgrid;
+		gap: 0 16px;
+		padding-top: 0;
+		border-top: 0;
 	}
 
-	.student-actions-dropdown {
-		top: calc(100% + 7px);
-		bottom: auto;
+	/* Column labels live in the sticky header on desktop. */
+	.student-card-body p strong {
+		display: none;
+	}
+
+	.student-card-body p {
+		font-size: 0.8rem;
 	}
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.student-card,
-	.student-actions-dropdown {
-		animation: none;
-	}
-
 	.student-card {
 		transition: none;
 	}
