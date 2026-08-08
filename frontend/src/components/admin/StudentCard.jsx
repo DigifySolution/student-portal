@@ -173,19 +173,17 @@ const StudentCard = ({
 			</div>
 			<div className="student-card-body">
 				<p>
-					<strong>الهاتف:</strong> {student.phone_number}
-				</p>
-				{student.parent_phone && (
-					<p>
-						<strong>هاتف ولي الأمر:</strong> {student.parent_phone}
-					</p>
-				)}
-				<p>
-					<strong>الصف:</strong> {gradeLabels[student.grade] || student.grade}
+					<strong>الهاتف</strong> {student.phone_number}
 				</p>
 				<p>
-					<strong>المجموعة:</strong>{" "}
-					{groupLabels[student.student_group] || student.student_group || "N/A"}
+					<strong>هاتف ولي الأمر</strong> {student.parent_phone || "—"}
+				</p>
+				<p>
+					<strong>الصف</strong> {gradeLabels[student.grade] || student.grade}
+				</p>
+				<p>
+					<strong>المجموعة</strong>{" "}
+					{groupLabels[student.student_group] || student.student_group || "—"}
 				</p>
 			</div>
 		</div>

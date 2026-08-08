@@ -8,14 +8,13 @@
 .admin-main-content {
 	flex-grow: 1;
 	min-width: 0;
-	padding: 20px;
 	margin-right: 258px;
 	width: calc(100% - 258px);
+	min-height: calc(100vh - 76px);
 }
 
 @media (max-width: 768px) {
 	.admin-main-content {
-		padding: 20px 12px;
 		margin-right: 0;
 		width: 100%;
 	}

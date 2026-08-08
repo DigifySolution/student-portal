@@ -1,13 +1,25 @@
 .student-management {
 	--student-ink: #10271b;
 	--student-muted: #65776b;
+	position: relative;
 	min-height: calc(100vh - 76px);
-	margin: -20px;
-	padding: 38px clamp(18px, 3vw, 48px) 64px;
+	padding: 34px clamp(16px, 2.2vw, 34px) 64px;
+	color: var(--student-ink);
+}
+
+/*
+ * Painted on a fixed layer so overscrolling past the container never exposes
+ * the underlying shell background.
+ */
+.student-management::after {
+	content: "";
+	position: fixed;
+	z-index: -1;
+	inset: 0;
+	pointer-events: none;
 	background:
 		radial-gradient(circle at 15% 0%, rgba(0, 230, 118, 0.12), transparent 28%),
 		#f4fbf5;
-	color: var(--student-ink);
 }
 
 .student-management-header {
@@ -16,8 +28,8 @@
 	align-items: flex-end;
 	justify-content: space-between;
 	gap: 24px;
-	max-width: 1440px;
-	margin: 0 auto 27px;
+	width: 100%;
+	margin: 0 0 27px;
 }
 
 .student-management-header::before {
@@ -69,8 +81,8 @@
 	grid-template-columns: minmax(220px, 1.7fr) repeat(2, minmax(150px, 0.8fr)) auto auto;
 	align-items: center;
 	gap: 10px;
-	max-width: 1440px;
-	margin: 0 auto 25px;
+	width: 100%;
+	margin: 0 0 25px;
 	padding: 12px;
 	border: 1px solid rgba(186, 203, 185, 0.65);
 	border-radius: 18px;
@@ -126,10 +138,11 @@
 
 .student-list {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-	gap: 17px;
-	max-width: 1440px;
-	margin: 0 auto;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 16px;
+	width: 100%;
+	max-width: none;
+	margin: 0;
 }
 
 .pagination {
@@ -138,8 +151,8 @@
 	justify-content: center;
 	flex-wrap: wrap;
 	gap: 7px;
-	max-width: 1440px;
-	margin: 26px auto 0;
+	width: 100%;
+	margin: 26px 0 0;
 	padding: 15px;
 	border: 1px solid rgba(186, 203, 185, 0.6);
 	border-radius: 16px;
@@ -257,9 +270,14 @@
 	}
 }
 
+@media (max-width: 1100px) {
+	.student-list {
+		grid-template-columns: 1fr;
+	}
+}
+
 @media (max-width: 768px) {
 	.student-management {
-		margin: -20px -12px;
 		padding: 30px 14px 48px;
 	}
 	.student-management-header {

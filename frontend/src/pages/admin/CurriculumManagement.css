@@ -4,7 +4,6 @@
 	--admin-line: #d9e9dc;
 	--admin-paper: rgba(255, 255, 255, 0.78);
 	min-height: calc(100vh - 76px);
-	margin: -20px;
 	padding: 38px clamp(18px, 3vw, 48px) 64px;
 	background:
 		radial-gradient(circle at 15% 0%, rgba(0, 230, 118, 0.12), transparent 28%),
@@ -811,7 +810,6 @@
 
 @media (max-width: 640px) {
 	.admin-curriculum-page {
-		margin: -20px -12px;
 		padding: 28px 14px 48px;
 	}
 	.admin-curriculum-hero h1 {

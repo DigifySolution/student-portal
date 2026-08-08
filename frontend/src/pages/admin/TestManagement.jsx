@@ -103,6 +103,7 @@ const TestManagement = () => {
 	const [currentTest, setCurrentTest] = useState(null);
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const [pdfProgress, setPdfProgress] = useState(null);
+	const [openMenuTestId, setOpenMenuTestId] = useState(null);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [gradeFilter, setGradeFilter] = useState("");
 	const [testTypeFilter, setTestTypeFilter] = useState("");
@@ -117,6 +118,25 @@ const TestManagement = () => {
 		const interval = setInterval(() => setNow(Date.now()), 30000);
 		return () => clearInterval(interval);
 	}, []);
+
+	// Dismiss the row action menu on outside click or Escape.
+	useEffect(() => {
+		if (openMenuTestId === null) return;
+
+		const closeOnOutside = (event) => {
+			if (!event.target.closest(".test-actions")) setOpenMenuTestId(null);
+		};
+		const closeOnEscape = (event) => {
+			if (event.key === "Escape") setOpenMenuTestId(null);
+		};
+
+		document.addEventListener("mousedown", closeOnOutside);
+		document.addEventListener("keydown", closeOnEscape);
+		return () => {
+			document.removeEventListener("mousedown", closeOnOutside);
+			document.removeEventListener("keydown", closeOnEscape);
+		};
+	}, [openMenuTestId]);
 
 	const fetchTests = async () => {
 		try {
@@ -413,15 +433,9 @@ const TestManagement = () => {
 				<button
 					className="btn-primary"
 					onClick={() => setShowCreateModal(true)}
+					type="button"
 				>
 					إضافة اختبار جديد
-				</button>
-				<button
-					className="btn-outline"
-					onClick={() => setShowExportModal(true)}
-					style={{ marginInlineStart: 8 }}
-				>
-					تصدير الترتيب
 				</button>
 			</div>
 
@@ -584,22 +598,12 @@ const TestManagement = () => {
 									<span className="stat-number">{test.graded_count || 0}</span>
 									<span className="stat-label">مُصحح</span>
 								</div>
-								{test.images && test.images.length > 0 && (
-									<div className="stat">
-										<button
-											className="btn btn-sm btn-outline-primary"
-											onClick={(e) => {
-												e.stopPropagation();
-												openImageModal(test);
-											}}
-											title="عرض الأسئلة"
-										>
-											<FaEye className="me-1" />
-											{test.images.length}{" "}
-											{test.images.length === 1 ? "صورة" : "صور"}
-										</button>
-									</div>
-								)}
+								<div className="stat">
+									<span className="stat-number">
+										{test.images ? test.images.length : 0}
+									</span>
+									<span className="stat-label">صور</span>
+								</div>
 							</div>
 
 							<div className="test-controls">
@@ -640,41 +644,97 @@ const TestManagement = () => {
 
 							<div className="test-actions">
 								<button
-									className="btn-outline"
-									onClick={() => viewSubmissions(test)}
+									aria-expanded={openMenuTestId === test.id}
+									aria-haspopup="menu"
+									aria-label="قائمة إجراءات الاختبار"
+									className="test-menu-trigger"
+									onClick={() =>
+										setOpenMenuTestId((current) =>
+											current === test.id ? null : test.id,
+										)
+									}
+									type="button"
 								>
-									عرض المشاركات
+									<span className="material-symbols-outlined">more_horiz</span>
 								</button>
-								{test.images && test.images.length > 0 && (
-									<button
-										className="btn-pdf"
-										onClick={() => downloadTestAsPDF(test)}
-										disabled={pdfProgress !== null}
-									>
-										{pdfProgress && pdfProgress.testId === test.id ? (
-											<span>
-												جاري التحميل ({pdfProgress.current}/{pdfProgress.total})
+
+								{openMenuTestId === test.id ? (
+									<div className="test-actions-dropdown" role="menu">
+										<button
+											onClick={() => {
+												setOpenMenuTestId(null);
+												viewSubmissions(test);
+											}}
+											role="menuitem"
+											type="button"
+										>
+											<span className="material-symbols-outlined">
+												fact_check
 											</span>
-										) : (
-											<>
-												<FaFilePdf style={{ marginInlineEnd: 4 }} />
-												<span>تحميل PDF</span>
-											</>
-										)}
-									</button>
-								)}
-								<button
-									className="btn-secondary"
-									onClick={() => setEditingTest(test)}
-								>
-									تعديل
-								</button>
-								<button
-									className="btn-danger"
-									onClick={() => deleteTest(test.id)}
-								>
-									حذف
-								</button>
+											عرض المشاركات
+										</button>
+
+										{test.images && test.images.length > 0 ? (
+											<button
+												onClick={() => {
+													setOpenMenuTestId(null);
+													openImageModal(test);
+												}}
+												role="menuitem"
+												type="button"
+											>
+												<span className="material-symbols-outlined">
+													imagesmode
+												</span>
+												عرض الصور ({test.images.length})
+											</button>
+										) : null}
+
+										{test.images && test.images.length > 0 ? (
+											<button
+												disabled={pdfProgress !== null}
+												onClick={() => {
+													setOpenMenuTestId(null);
+													downloadTestAsPDF(test);
+												}}
+												role="menuitem"
+												type="button"
+											>
+												<span className="material-symbols-outlined">
+													picture_as_pdf
+												</span>
+												{pdfProgress && pdfProgress.testId === test.id
+													? `جاري التحميل (${pdfProgress.current}/${pdfProgress.total})`
+													: "تحميل PDF"}
+											</button>
+										) : null}
+
+										<button
+											onClick={() => {
+												setOpenMenuTestId(null);
+												setEditingTest(test);
+											}}
+											role="menuitem"
+											type="button"
+										>
+											<span className="material-symbols-outlined">edit</span>
+											تعديل
+										</button>
+
+										<button
+											className="is-danger"
+											onClick={() => {
+												setOpenMenuTestId(null);
+												deleteTest(test.id);
+											}}
+											role="menuitem"
+											type="button"
+										>
+											<span className="material-symbols-outlined">delete</span>
+											حذف
+										</button>
+									</div>
+								) : null}
 							</div>
 						</div>
 					))
