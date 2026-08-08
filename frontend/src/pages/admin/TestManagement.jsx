@@ -533,8 +533,7 @@ const TestManagement = () => {
 							<span>الصف والمجموعة</span>
 							<span>التوقيت</span>
 							<span>الحالة</span>
-							<span>الإحصائيات</span>
-							<span>النتائج</span>
+							<span>المشاركات</span>
 							<span />
 						</div>
 
@@ -550,94 +549,46 @@ const TestManagement = () => {
 									</span>
 								</div>
 
-								<div className="test-details">
+								<div className="test-card-body">
 									<p>
-										<strong>الصف</strong> {getGradeLabel(test.grade)}
+										<strong>الصف والمجموعة</strong>
+										<span>{getGradeLabel(test.grade)}</span>
+										<small>
+											{test.student_group
+												? getGroupLabel(test.student_group)
+												: "كل الطلاب"}
+										</small>
 									</p>
-									<p>
-										<strong>المجموعة</strong>{" "}
-										{test.student_group
-											? getGroupLabel(test.student_group)
-											: "كل الطلاب"}
-									</p>
-								</div>
 
-								<div className="test-schedule">
 									<p>
-										<strong>البداية</strong> {formatDate(test.start_time)}
+										<strong>التوقيت</strong>
+										<span>{formatDate(test.start_time)}</span>
+										<small>
+											{test.duration_minutes
+												? `${test.duration_minutes} دقيقة`
+												: "المدة غير محددة"}
+										</small>
 									</p>
-									<p>
-										<strong>النهاية</strong> {formatDate(test.end_time)}
-									</p>
-									<p>
-										<strong>المدة</strong>{" "}
-										{test.duration_minutes
-											? `${test.duration_minutes} دقيقة`
-											: "غير محددة"}
-									</p>
-								</div>
 
-								{/* Countdown Timer */}
-								<CountdownTimer
-									startTimeMs={test.start_time_ms}
-									endTimeMs={test.end_time_ms}
-								/>
+									<div className="test-cell-status">
+										<strong>الحالة</strong>
+										<CountdownTimer
+											startTimeMs={test.start_time_ms}
+											endTimeMs={test.end_time_ms}
+										/>
+									</div>
 
-								<div className="test-stats">
-									<div className="stat">
-										<span className="stat-number">
-											{test.submission_count || 0}
+									<p>
+										<strong>المشاركات</strong>
+										<span>
+											{test.submission_count || 0} مشارك ·{" "}
+											{test.graded_count || 0} مُصحح
 										</span>
-										<span className="stat-label">مشارك</span>
-									</div>
-									<div className="stat">
-										<span className="stat-number">
-											{test.graded_count || 0}
-										</span>
-										<span className="stat-label">مُصحح</span>
-									</div>
-									<div className="stat">
-										<span className="stat-number">
-											{test.images ? test.images.length : 0}
-										</span>
-										<span className="stat-label">صور</span>
-									</div>
-								</div>
-
-								<div className="test-controls">
-									<div className="toggle-group">
-										<div className="toggle-item">
-											<label>
-												<input
-													type="checkbox"
-													className="toggle-switch"
-													checked={test.view_permission}
-													onChange={() =>
-														toggleViewPermission(test.id, test.view_permission)
-													}
-												/>
-												<span className="toggle-label">عرض النتائج</span>
-											</label>
-										</div>
-										{test.view_type === "TEACHER_CONTROLLED" && (
-											<div className="toggle-item">
-												<label>
-													<input
-														type="checkbox"
-														className="toggle-switch"
-														checked={test.show_grade_outside}
-														onChange={() =>
-															toggleShowGradeOutside(
-																test.id,
-																test.show_grade_outside,
-															)
-														}
-													/>
-													<span className="toggle-label">عرض الدرجة</span>
-												</label>
-											</div>
-										)}
-									</div>
+										<small>
+											{test.images ? test.images.length : 0} صورة
+											{test.view_permission ? " · النتائج ظاهرة" : ""}
+										</small>
+									</p>
 								</div>
 
 								<div className="test-actions">
@@ -704,6 +655,43 @@ const TestManagement = () => {
 												{pdfProgress && pdfProgress.testId === test.id
 													? `جاري التحميل (${pdfProgress.current}/${pdfProgress.total})`
 													: "تحميل PDF"}
+											</button>
+										) : null}
+
+										<button
+											onClick={() => {
+												setOpenMenuTestId(null);
+												toggleViewPermission(test.id, test.view_permission);
+											}}
+											role="menuitem"
+											type="button"
+										>
+											<span className="material-symbols-outlined">
+												{test.view_permission ? "visibility_off" : "visibility"}
+											</span>
+											{test.view_permission
+												? "إخفاء النتائج"
+												: "إظهار النتائج"}
+										</button>
+
+										{test.view_type === "TEACHER_CONTROLLED" ? (
+											<button
+												onClick={() => {
+													setOpenMenuTestId(null);
+													toggleShowGradeOutside(
+														test.id,
+														test.show_grade_outside,
+													);
+												}}
+												role="menuitem"
+												type="button"
+											>
+												<span className="material-symbols-outlined">
+													grade
+												</span>
+												{test.show_grade_outside
+													? "إخفاء الدرجة"
+													: "إظهار الدرجة"}
 											</button>
 										) : null}
 

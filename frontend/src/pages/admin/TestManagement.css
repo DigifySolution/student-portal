@@ -963,47 +963,55 @@
 .tests-grid {
 	display: flex;
 	flex-direction: column;
-	gap: 14px;
+	gap: 8px;
 	max-width: none;
 	margin: 0;
 }
 
+/* Base (mobile): stacked card, matching .student-card. */
 .test-card {
 	position: relative;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	grid-template-areas:
+		"header actions"
+		"body   body";
+	align-items: center;
+	gap: 14px;
+	width: 100%;
 	min-width: 0;
-	padding: 21px;
-	border: 1px solid rgba(255, 255, 255, 0.75);
-	border-right: 0;
-	border-radius: 20px;
-	background: rgba(255, 255, 255, 0.76);
-	box-shadow: 0 10px 28px rgba(0, 109, 53, 0.08);
-	backdrop-filter: blur(16px);
-	-webkit-backdrop-filter: blur(16px);
-	animation: admin-test-rise 0.45s ease both;
+	padding: 16px 18px;
+	border: 1px solid rgba(0, 109, 53, 0.1);
+	border-radius: 16px;
+	background: #fff;
+	box-shadow: 0 4px 14px rgba(0, 109, 53, 0.06);
 	transition:
-		transform 0.25s ease,
-		box-shadow 0.25s ease;
+		box-shadow 0.2s ease,
+		border-color 0.2s ease;
 }
 
 .test-card::before {
 	content: "";
 	position: absolute;
-	top: 20px;
-	right: 0;
-	width: 4px;
-	height: 58px;
-	border-radius: 5px 0 0 5px;
+	top: 14px;
+	bottom: 14px;
+	inset-inline-start: 0;
+	width: 3px;
+	height: auto;
+	border-radius: 0 4px 4px 0;
 	background: linear-gradient(#00e676, #006d35);
 }
 
 .test-card:hover {
-	transform: translateY(-5px);
-	box-shadow: 0 18px 40px rgba(0, 109, 53, 0.14);
+	border-color: rgba(0, 169, 82, 0.4);
+	box-shadow: 0 10px 26px rgba(0, 109, 53, 0.11);
 }
+
 .test-header {
+	grid-area: header;
 	align-items: flex-start;
-	gap: 12px;
-	margin-bottom: 18px;
+	gap: 8px;
+	margin-bottom: 0;
 }
 .test-header h3 {
 	min-width: 0;
@@ -1779,6 +1787,7 @@
 /* ── Full-bleed horizontal record rows ── */
 
 .test-actions {
+	grid-area: actions;
 	position: relative;
 	z-index: 40;
 	display: flex;
@@ -1897,32 +1906,7 @@
 	z-index: 60;
 }
 
-/* ── Schedule cell (base styles must precede the table media query) ── */
-
-.test-schedule {
-	display: grid;
-	gap: 4px;
-	min-width: 0;
-}
-
-.test-schedule p {
-	display: flex;
-	min-width: 0;
-	flex-direction: column;
-	gap: 2px;
-	margin: 0;
-	color: #31543c;
-	font-size: 0.76rem;
-	font-weight: 700;
-	line-height: 1.4;
-}
-
-.test-schedule strong {
-	color: #85978a;
-	font-size: 0.63rem;
-	font-weight: 800;
-	letter-spacing: 0.04em;
-}
+/* ── Test record row (mirrors the student card structure) ── */
 
 .test-card.is-finished {
 	border-color: #e5d9d4;
@@ -1932,23 +1916,63 @@
 	background: #b4aaa5;
 }
 
+/* Base (mobile): stacked card. */
+.test-card-body {
+	grid-area: body;
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	align-items: center;
+	gap: 12px;
+	min-width: 0;
+	margin: 0;
+	padding-top: 13px;
+	border-top: 1px solid #eef4ef;
+}
+
+.test-card-body > p,
+.test-cell-status {
+	display: flex;
+	min-width: 0;
+	flex-direction: column;
+	gap: 2px;
+	margin: 0;
+	color: #31543c;
+	font-size: 0.82rem;
+	font-weight: 700;
+	line-height: 1.4;
+	overflow-wrap: anywhere;
+}
+
+.test-card-body strong {
+	color: #8a9c8e;
+	font-size: 0.64rem;
+	font-weight: 800;
+	letter-spacing: 0.04em;
+}
+
+.test-card-body small {
+	color: #7d8f81;
+	font-size: 0.7rem;
+	font-weight: 700;
+}
+
 /* Column header strip: hidden until the layout is wide enough to be a table. */
 .test-table-head {
 	display: none;
 }
 
 /*
- * Table geometry. One shared column template drives the sticky header strip
- * and every record row, so the columns can never drift apart.
+ * Table geometry. One shared column template drives the header strip and
+ * every record row, so columns can never drift apart. Mirrors the student
+ * table: identity + 4 data cells + actions.
  *
- * This block is intentionally the LAST layout rule in the file: earlier
- * generations of these selectors exist above, and equal specificity means
- * source order decides the winner.
+ * Intentionally the LAST layout rule in the file: earlier generations of
+ * these selectors exist above, and equal specificity means source order wins.
  */
 @media (min-width: 1080px) {
 	.tests-grid {
-		--test-cols: minmax(0, 1.5fr) minmax(0, 0.95fr) minmax(0, 1.1fr)
-			minmax(140px, 0.8fr) minmax(0, 0.8fr) minmax(0, 0.75fr) 52px;
+		--test-cols: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr)
+			minmax(0, 0.95fr) minmax(0, 1.05fr) 52px;
 	}
 
 	.test-table-head,
@@ -1971,14 +1995,14 @@
 
 	.test-card {
 		grid-template-areas: none;
-		min-height: 84px;
-		padding: 12px 18px;
+		min-height: 68px;
+		padding: 10px 18px;
 		border-radius: 12px;
 	}
 
 	.test-card::before {
-		top: 12px;
-		bottom: 12px;
+		top: 10px;
+		bottom: 10px;
 		height: auto;
 	}
 
@@ -1986,7 +2010,7 @@
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
-		gap: 6px;
+		gap: 5px;
 		min-width: 0;
 		margin: 0;
 		padding: 0;
@@ -2002,14 +2026,27 @@
 		margin: 0;
 	}
 
-	.test-details {
+	/*
+	 * The four data cells are promoted onto the row's own column tracks via
+	 * subgrid, so each lines up with its header label.
+	 */
+	.test-card-body {
 		display: grid;
-		grid-template-columns: 1fr;
-		gap: 4px;
-		min-width: 0;
-		margin: 0;
-		padding: 0;
-		border: 0;
+		grid-column: 2 / 6;
+		grid-template-columns: subgrid;
+		gap: 0 16px;
+		padding-top: 0;
+		border-top: 0;
+	}
+
+	/* Labels live in the sticky header on desktop. */
+	.test-card-body strong {
+		display: none;
+	}
+
+	.test-card-body > p,
+	.test-cell-status {
+		font-size: 0.8rem;
 	}
 
 	.test-countdown {
@@ -2019,8 +2056,8 @@
 		width: 100%;
 		min-height: 0;
 		margin: 0;
-		padding: 7px 9px;
-		font-size: 0.68rem;
+		padding: 6px 8px;
+		font-size: 0.67rem;
 	}
 
 	.test-countdown .countdown-values {
@@ -2029,61 +2066,7 @@
 
 	.test-countdown .countdown-unit {
 		padding: 2px 5px;
-		font-size: 0.68rem;
-	}
-
-	.test-stats {
-		display: flex;
-		justify-content: flex-start;
-		gap: 12px;
-		width: 100%;
-		margin: 0;
-		padding: 0;
-		border: 0;
-		background: transparent;
-	}
-
-	.test-stats .stat {
-		min-width: 0;
-		padding: 0;
-	}
-
-	.test-stats .stat-number {
-		font-size: 1rem;
-	}
-
-	.test-stats .stat-label {
-		font-size: 0.6rem;
-	}
-
-	.test-controls {
-		margin: 0;
-		padding: 0;
-		border: 0;
-	}
-
-	.test-controls .toggle-group {
-		flex-direction: column;
-		gap: 5px;
-	}
-
-	.test-controls .toggle-label {
 		font-size: 0.67rem;
-	}
-
-	.test-controls .toggle-switch {
-		width: 30px;
-		height: 16px;
-		margin-left: 5px;
-	}
-
-	.test-controls .toggle-switch:before {
-		width: 12px;
-		height: 12px;
-	}
-
-	.test-controls .toggle-switch:checked:before {
-		left: 16px;
 	}
 
 	.test-actions {
