@@ -21,6 +21,67 @@
 		border-color 0.25s ease;
 }
 
+/* Column header strip: hidden until the layout is wide enough to be a table. */
+.student-table-head {
+	display: none;
+}
+
+/*
+ * Table geometry shared with .student-table-head so every column stays
+ * aligned down the page.
+ */
+@media (min-width: 1000px) {
+	.student-table-head,
+	.student-card {
+		display: grid;
+		grid-template-columns:
+			minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr)
+			minmax(0, 1fr) minmax(0, 1fr) 56px;
+		align-items: center;
+		gap: 0 18px;
+	}
+
+	.student-table-head {
+		position: sticky;
+		top: 76px;
+		z-index: 30;
+		margin-bottom: 2px;
+		padding: 0 20px 10px;
+		border-bottom: 1px solid #dfece1;
+		background: #f4fbf5;
+		color: #7c8f81;
+		font-size: 0.68rem;
+		font-weight: 800;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+	}
+
+	.student-card {
+		min-height: 76px;
+		padding: 12px 20px;
+		border-radius: 14px;
+	}
+
+	.student-card::before {
+		top: 12px;
+		bottom: 12px;
+	}
+
+	.student-card-header {
+		padding-inline-end: 0;
+		border-inline-end: 0;
+	}
+
+	/* Cells are laid out by the parent row, not nested in their own grid. */
+	.student-card-body {
+		display: contents;
+	}
+
+	.student-card-body p strong {
+		display: none;
+	}
+}
+
 .student-card:hover {
 	transform: translateY(-3px);
 	border-color: rgba(0, 169, 82, 0.35);
@@ -231,19 +292,27 @@
 	}
 }
 
-@media (max-width: 900px) {
+@media (max-width: 999px) {
 	.student-card {
 		grid-template-columns: minmax(0, 1fr) auto;
+		grid-template-areas:
+			"header actions"
+			"body   body";
 		gap: 14px;
 	}
 
 	.student-card-header {
+		grid-area: header;
 		padding-inline-end: 0;
 		border-inline-end: 0;
 	}
 
+	.student-card-actions-menu {
+		grid-area: actions;
+	}
+
 	.student-card-body {
-		grid-column: 1 / -1;
+		grid-area: body;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		padding-top: 14px;
 		border-top: 1px solid #edf3ed;

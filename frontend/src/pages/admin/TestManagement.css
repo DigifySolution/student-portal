@@ -1897,16 +1897,46 @@
 	z-index: 60;
 }
 
-@media (min-width: 1000px) {
+/* Column header strip: hidden until the layout is wide enough to be a table. */
+.test-table-head {
+	display: none;
+}
+
+/*
+ * Table geometry shared by the header strip and every record row so all
+ * columns stay aligned down the page.
+ */
+@media (min-width: 1080px) {
+	.test-table-head,
 	.test-card {
 		display: grid;
 		grid-template-columns:
-			minmax(0, 1.3fr) minmax(0, 1.6fr)
-			minmax(180px, 0.8fr) minmax(140px, 0.55fr) auto;
-		grid-template-areas: "header details countdown stats actions";
+			minmax(0, 1.45fr) minmax(0, 1fr) minmax(0, 1.15fr)
+			minmax(150px, 0.85fr) minmax(140px, 0.7fr) minmax(120px, 0.65fr) 56px;
 		align-items: center;
-		gap: 0 20px;
-		min-height: 128px;
+		gap: 0 18px;
+	}
+
+	.test-table-head {
+		position: sticky;
+		top: 76px;
+		z-index: 30;
+		margin-bottom: 2px;
+		padding: 0 20px 10px;
+		border-bottom: 1px solid #dfece1;
+		background: #f4fbf5;
+		color: #7c8f81;
+		font-size: 0.68rem;
+		font-weight: 800;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+	}
+
+	.test-card {
+		grid-template-areas: "header details schedule countdown stats controls actions";
+		min-height: 92px;
+		padding: 14px 20px;
+		border-radius: 14px;
 	}
 
 	.test-header {
@@ -1914,16 +1944,15 @@
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
-		align-self: center;
-		gap: 8px;
+		gap: 6px;
 		margin: 0;
-		padding-inline-end: 20px;
-		border-inline-end: 1px solid #edf3ed;
+		padding: 0;
+		border: 0;
 	}
 
 	.test-header h3 {
 		width: 100%;
-		font-size: 1.1rem;
+		font-size: 1rem;
 	}
 
 	.test-type {
@@ -1932,37 +1961,139 @@
 
 	.test-details {
 		grid-area: details;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		align-self: center;
+		grid-template-columns: 1fr;
+		gap: 4px;
 		margin: 0;
-		padding-inline-end: 20px;
-		border-inline-end: 1px solid #edf3ed;
+		padding: 0;
+		border: 0;
+	}
+
+	.test-schedule {
+		grid-area: schedule;
 	}
 
 	.test-countdown {
 		grid-area: countdown;
-		align-self: center;
 		width: 100%;
+		min-height: 0;
 		margin: 0;
 	}
 
 	.test-stats {
 		grid-area: stats;
-		align-self: center;
 		width: 100%;
 		margin: 0;
+		padding: 0;
+		border: 0;
+		background: transparent;
 	}
 
-	/* Result toggles live in the edit modal; the row stays scannable. */
 	.test-controls {
-		display: none;
+		grid-area: controls;
+		margin: 0;
+		padding: 0;
+		border: 0;
+	}
+
+	.test-controls .toggle-group {
+		flex-direction: column;
+		gap: 6px;
 	}
 
 	.test-actions {
 		grid-area: actions;
-		align-self: center;
-		padding-inline-start: 4px;
+		justify-content: center;
+		padding: 0;
 	}
+}
+
+/* ── Table cell density ── */
+
+@media (min-width: 1080px) {
+	.test-card::before {
+		top: 14px;
+		bottom: 14px;
+		height: auto;
+	}
+
+	.test-countdown {
+		flex-direction: column;
+		gap: 3px;
+		padding: 7px 9px;
+		font-size: 0.68rem;
+	}
+
+	.test-countdown .countdown-values {
+		gap: 3px;
+	}
+
+	.test-countdown .countdown-unit {
+		padding: 2px 5px;
+		font-size: 0.68rem;
+	}
+
+	.test-stats {
+		display: flex;
+		justify-content: flex-start;
+		gap: 14px;
+	}
+
+	.test-stats .stat {
+		padding: 0;
+	}
+
+	.test-stats .stat-number {
+		font-size: 1.02rem;
+	}
+
+	.test-stats .stat-label {
+		font-size: 0.6rem;
+	}
+
+	.test-controls .toggle-label {
+		font-size: 0.68rem;
+	}
+
+	.test-controls .toggle-switch {
+		width: 30px;
+		height: 16px;
+		margin-left: 5px;
+	}
+
+	.test-controls .toggle-switch:before {
+		width: 12px;
+		height: 12px;
+	}
+
+	.test-controls .toggle-switch:checked:before {
+		left: 16px;
+	}
+}
+
+.test-schedule {
+	display: grid;
+	gap: 4px;
+	min-width: 0;
+}
+
+.test-schedule p {
+	display: flex;
+	min-width: 0;
+	flex-direction: column;
+	gap: 2px;
+	margin: 0;
+	color: #31543c;
+	font-size: 0.76rem;
+	font-weight: 700;
+	line-height: 1.4;
+}
+
+.test-schedule strong {
+	color: #85978a;
+	font-size: 0.63rem;
+	font-weight: 800;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
 }
 
 .test-card.is-finished {

@@ -506,7 +506,7 @@ const TestManagement = () => {
 				)}
 			</div>
 
-			{/* Tests Grid */}
+			{/* Tests Table */}
 			<div className="tests-grid">
 				{filteredTests.length === 0 ? (
 					<div className="no-tests">
@@ -527,122 +527,120 @@ const TestManagement = () => {
 						) : null}
 					</div>
 				) : (
-					filteredTests.map((test) => (
-						<div
-							key={test.id}
-							className={`test-card ${isFinishedTest(test) ? "is-finished" : ""}`}
-						>
-							<div className="test-header">
-								<h3>{test.title}</h3>
-								<span className="test-type">
-									{getTestTypeLabel(test.test_type)}
-								</span>
-							</div>
+					<>
+						<div className="test-table-head" aria-hidden="true">
+							<span>الاختبار</span>
+							<span>الصف والمجموعة</span>
+							<span>التوقيت</span>
+							<span>الحالة</span>
+							<span>الإحصائيات</span>
+							<span>النتائج</span>
+							<span />
+						</div>
 
-							<div className="test-details">
-								<p>
-									<strong>الصف:</strong> {getGradeLabel(test.grade)}
-								</p>
-								{test.student_group && (
-									<p>
-										<strong>المجموعة:</strong>{" "}
-										{getGroupLabel(test.student_group)}
-									</p>
-								)}
-								<p>
-									<strong>وقت البداية:</strong> {formatDate(test.start_time)}
-								</p>
-								<p>
-									<strong>وقت النهاية:</strong> {formatDate(test.end_time)}
-								</p>
-								{test.duration_minutes && (
-									<p>
-										<strong>المدة:</strong> {test.duration_minutes} دقيقة
-									</p>
-								)}
-								{/* {test.average_score !== null &&
-									test.average_score !== undefined &&
-									Number(test.submission_count) > 0 && (
-										<p className="average-score">
-											<strong>📊 المتوسط:</strong>{" "}
-											{Math.floor(Number(test.average_score))}%
-											{test.correct_answers?.answers && (
-												<span className="average-correct">
-													{" "}
-													(
-													{Math.floor(
-														(Number(test.average_score) / 100) *
-															Object.keys(test.correct_answers.answers).length,
-													)}
-													/{Object.keys(test.correct_answers.answers).length})
-												</span>
-											)}
-										</p>
-									)} */}
-							</div>
-
-							{/* Countdown Timer */}
-							<CountdownTimer
-								startTimeMs={test.start_time_ms}
-								endTimeMs={test.end_time_ms}
-							/>
-
-							<div className="test-stats">
-								<div className="stat">
-									<span className="stat-number">
-										{test.submission_count || 0}
+						{filteredTests.map((test) => (
+							<div
+								key={test.id}
+								className={`test-card ${isFinishedTest(test) ? "is-finished" : ""}`}
+							>
+								<div className="test-header">
+									<h3>{test.title}</h3>
+									<span className="test-type">
+										{getTestTypeLabel(test.test_type)}
 									</span>
-									<span className="stat-label">مشارك</span>
 								</div>
-								<div className="stat">
-									<span className="stat-number">{test.graded_count || 0}</span>
-									<span className="stat-label">مُصحح</span>
-								</div>
-								<div className="stat">
-									<span className="stat-number">
-										{test.images ? test.images.length : 0}
-									</span>
-									<span className="stat-label">صور</span>
-								</div>
-							</div>
 
-							<div className="test-controls">
-								<div className="toggle-group">
-									<div className="toggle-item">
-										<label>
-											<input
-												type="checkbox"
-												className="toggle-switch"
-												checked={test.view_permission}
-												onChange={() =>
-													toggleViewPermission(test.id, test.view_permission)
-												}
-											/>
-											<span className="toggle-label">عرض النتائج</span>
-										</label>
+								<div className="test-details">
+									<p>
+										<strong>الصف</strong> {getGradeLabel(test.grade)}
+									</p>
+									<p>
+										<strong>المجموعة</strong>{" "}
+										{test.student_group
+											? getGroupLabel(test.student_group)
+											: "كل الطلاب"}
+									</p>
+								</div>
+
+								<div className="test-schedule">
+									<p>
+										<strong>البداية</strong> {formatDate(test.start_time)}
+									</p>
+									<p>
+										<strong>النهاية</strong> {formatDate(test.end_time)}
+									</p>
+									<p>
+										<strong>المدة</strong>{" "}
+										{test.duration_minutes
+											? `${test.duration_minutes} دقيقة`
+											: "غير محددة"}
+									</p>
+								</div>
+
+								{/* Countdown Timer */}
+								<CountdownTimer
+									startTimeMs={test.start_time_ms}
+									endTimeMs={test.end_time_ms}
+								/>
+
+								<div className="test-stats">
+									<div className="stat">
+										<span className="stat-number">
+											{test.submission_count || 0}
+										</span>
+										<span className="stat-label">مشارك</span>
 									</div>
-									{test.view_type === "TEACHER_CONTROLLED" && (
+									<div className="stat">
+										<span className="stat-number">
+											{test.graded_count || 0}
+										</span>
+										<span className="stat-label">مُصحح</span>
+									</div>
+									<div className="stat">
+										<span className="stat-number">
+											{test.images ? test.images.length : 0}
+										</span>
+										<span className="stat-label">صور</span>
+									</div>
+								</div>
+
+								<div className="test-controls">
+									<div className="toggle-group">
 										<div className="toggle-item">
 											<label>
 												<input
 													type="checkbox"
 													className="toggle-switch"
-													checked={test.show_grade_outside}
+													checked={test.view_permission}
 													onChange={() =>
-														toggleShowGradeOutside(
-															test.id,
-															test.show_grade_outside,
-														)
+														toggleViewPermission(test.id, test.view_permission)
 													}
 												/>
-												<span className="toggle-label">عرض الدرجة</span>
+												<span className="toggle-label">عرض النتائج</span>
 											</label>
 										</div>
-									)}
+										{test.view_type === "TEACHER_CONTROLLED" && (
+											<div className="toggle-item">
+												<label>
+													<input
+														type="checkbox"
+														className="toggle-switch"
+														checked={test.show_grade_outside}
+														onChange={() =>
+															toggleShowGradeOutside(
+																test.id,
+																test.show_grade_outside,
+															)
+														}
+													/>
+													<span className="toggle-label">عرض الدرجة</span>
+												</label>
+											</div>
+										)}
+									</div>
 								</div>
-							</div>
 
-							<div className="test-actions">
+								<div className="test-actions">
 								<button
 									aria-expanded={openMenuTestId === test.id}
 									aria-haspopup="menu"
@@ -735,9 +733,10 @@ const TestManagement = () => {
 										</button>
 									</div>
 								) : null}
+								</div>
 							</div>
-						</div>
-					))
+						))}
+					</>
 				)}
 			</div>
 

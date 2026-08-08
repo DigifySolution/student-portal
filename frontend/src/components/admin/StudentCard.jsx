@@ -110,66 +110,6 @@ const StudentCard = ({
 						</button>
 					</span>
 				</h3>
-				<div className="student-card-actions-menu" ref={actionsMenuRef}>
-					<button
-						type="button"
-						className="menu-trigger-btn"
-						onClick={() => setMenuOpen((prev) => !prev)}
-						title="قائمة الإجراءات"
-						aria-expanded={menuOpen}
-						aria-haspopup="menu"
-					>
-						⋯
-					</button>
-					{menuOpen && (
-						<div className="student-actions-dropdown">
-							<button
-								type="button"
-								onClick={() => {
-									onEdit(student);
-									closeMenu();
-								}}
-								className="dropdown-action-btn"
-							>
-								تعديل
-							</button>
-							<button
-								type="button"
-								onClick={() => {
-									onDelete(student.id);
-									closeMenu();
-								}}
-								className="dropdown-action-btn danger"
-							>
-								حذف
-							</button>
-							<button
-								type="button"
-								onClick={() => {
-									if (onCopyLoginLink) {
-										onCopyLoginLink(student);
-									}
-									closeMenu();
-								}}
-								className="dropdown-action-btn"
-							>
-								نسخ رابط الدخول كطالب
-							</button>
-							<button
-								type="button"
-								onClick={() => {
-									if (onViewResults) {
-										onViewResults(student);
-									}
-									closeMenu();
-								}}
-								className="dropdown-action-btn"
-							>
-								عرض النتائج
-							</button>
-						</div>
-					)}
-				</div>
 			</div>
 			<div className="student-card-body">
 				<p>
@@ -185,6 +125,66 @@ const StudentCard = ({
 					<strong>المجموعة</strong>{" "}
 					{groupLabels[student.student_group] || student.student_group || "—"}
 				</p>
+			</div>
+			<div className="student-card-actions-menu" ref={actionsMenuRef}>
+				<button
+					type="button"
+					className="menu-trigger-btn"
+					onClick={() => setMenuOpen((prev) => !prev)}
+					title="قائمة الإجراءات"
+					aria-expanded={menuOpen}
+					aria-haspopup="menu"
+				>
+					⋯
+				</button>
+				{menuOpen && (
+					<div className="student-actions-dropdown">
+						<button
+							type="button"
+							onClick={() => {
+								onEdit(student);
+								closeMenu();
+							}}
+							className="dropdown-action-btn"
+						>
+							تعديل
+						</button>
+						<button
+							type="button"
+							onClick={() => {
+								onDelete(student.id);
+								closeMenu();
+							}}
+							className="dropdown-action-btn danger"
+						>
+							حذف
+						</button>
+						<button
+							type="button"
+							onClick={() => {
+								if (onCopyLoginLink) {
+									onCopyLoginLink(student);
+								}
+								closeMenu();
+							}}
+							className="dropdown-action-btn"
+						>
+							نسخ رابط الدخول كطالب
+						</button>
+						<button
+							type="button"
+							onClick={() => {
+								if (onViewResults) {
+									onViewResults(student);
+								}
+								closeMenu();
+							}}
+							className="dropdown-action-btn"
+						>
+							عرض النتائج
+						</button>
+					</div>
+				)}
 			</div>
 		</div>
 	);

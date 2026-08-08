@@ -136,10 +136,14 @@
 	white-space: nowrap;
 }
 
+.student-table-wrap {
+	width: 100%;
+}
+
 .student-list {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
 	width: 100%;
 	max-width: none;
 	margin: 0;
@@ -267,12 +271,6 @@
 	}
 	.per-page-selector {
 		justify-content: flex-start;
-	}
-}
-
-@media (max-width: 1100px) {
-	.student-list {
-		grid-template-columns: 1fr;
 	}
 }
 

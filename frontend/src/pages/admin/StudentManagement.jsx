@@ -362,18 +362,30 @@ const StudentManagement = () => {
 				</div>
 			</div>
 
-			<div className="student-list">
-				{paginatedStudents.map((student) => (
-					<StudentCard
-						key={student.id}
-						student={student}
-						onEdit={handleEditStudent}
-						onDelete={handleDeleteStudent}
-						onCopyLoginLink={handleCopyLoginLink}
-						onViewResults={openResultsModal}
-					/>
-				))}
-			</div>
+			{paginatedStudents.length > 0 ? (
+				<div className="student-table-wrap">
+					<div className="student-table-head" aria-hidden="true">
+						<span>الطالب</span>
+						<span>الهاتف</span>
+						<span>هاتف ولي الأمر</span>
+						<span>الصف</span>
+						<span>المجموعة</span>
+						<span />
+					</div>
+					<div className="student-list">
+						{paginatedStudents.map((student) => (
+							<StudentCard
+								key={student.id}
+								student={student}
+								onEdit={handleEditStudent}
+								onDelete={handleDeleteStudent}
+								onCopyLoginLink={handleCopyLoginLink}
+								onViewResults={openResultsModal}
+							/>
+						))}
+					</div>
+				</div>
+			) : null}
 
 			{/* Pagination Controls */}
 			{totalPages > 1 && (
