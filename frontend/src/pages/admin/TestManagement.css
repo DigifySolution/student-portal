@@ -12,10 +12,6 @@
 	color: var(--test-ink);
 }
 
-/*
- * Painted on a fixed layer so overscrolling past the container never exposes
- * the underlying shell background.
- */
 .test-management::after {
 	content: "";
 	position: fixed;
@@ -27,7 +23,7 @@
 		#f4fbf5;
 }
 
-/* Header */
+/* Header Title Block */
 .test-management-header {
 	position: relative;
 	display: flex;
@@ -38,17 +34,20 @@
 	margin: 0 0 27px;
 }
 
-.test-management-header::before {
-	content: "اختبارات الأكاديمية";
-	position: absolute;
-	margin-top: -72px;
+.test-management-header-title {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.test-management-header-title .subtitle {
 	color: #007c3f;
 	font-size: 0.78rem;
 	font-weight: 800;
 	letter-spacing: 0.08em;
 }
 
-.test-management-header h1 {
+.test-management-header-title h1 {
 	margin: 0;
 	color: #10271b;
 	font-size: clamp(2rem, 4vw, 3.15rem);
@@ -85,8 +84,8 @@
 
 /* Filter Toolbar */
 .test-management .filters {
-	display: grid;
-	grid-template-columns: minmax(220px, 1.7fr) repeat(2, minmax(130px, 0.8fr)) auto auto auto auto;
+	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
 	gap: 10px;
 	width: 100%;
@@ -99,9 +98,21 @@
 	backdrop-filter: blur(18px);
 }
 
-.test-management .filters input,
-.test-management .filters > select,
-.test-management .per-page-selector select {
+.test-management .filters input {
+	flex: 1 1 220px;
+	min-height: 43px;
+	padding: 0 13px;
+	border: 1px solid #cfe1d2;
+	border-radius: 11px;
+	outline: 0;
+	background: #fbfffc;
+	color: var(--test-ink);
+	font: inherit;
+	font-size: 0.82rem;
+}
+
+.test-management .filters select {
+	flex: 0 1 150px;
 	min-height: 43px;
 	padding: 0 13px;
 	border: 1px solid #cfe1d2;
@@ -114,8 +125,7 @@
 }
 
 .test-management .filters input:focus,
-.test-management .filters > select:focus,
-.test-management .per-page-selector select:focus {
+.test-management .filters select:focus {
 	border-color: #00a952;
 	box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.13);
 }
@@ -173,6 +183,7 @@
 }
 
 .test-management .results-count {
+	margin-inline-start: auto;
 	padding: 9px 13px;
 	border-radius: 999px;
 	background: #d8f6df;
@@ -217,15 +228,10 @@
 
 .test-card {
 	position: relative;
-	display: grid;
-	grid-template-columns: minmax(0, 1fr) auto;
-	grid-template-areas:
-		"header actions"
-		"body   body";
-	align-items: center;
-	gap: 14px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
 	width: 100%;
-	min-width: 0;
 	padding: 16px 18px;
 	border: 1px solid rgba(0, 109, 53, 0.1);
 	border-radius: 16px;
@@ -252,17 +258,25 @@
 	background: linear-gradient(#00e676, #006d35);
 }
 
-.test-card-header {
-	grid-area: header;
-	display: flex;
-	align-items: center;
-	min-width: 0;
-	margin: 0;
+.mobile-label {
+	display: block;
+	color: #8a9c8e;
+	font-size: 0.64rem;
+	font-weight: 800;
+	letter-spacing: 0.04em;
+	margin-bottom: 2px;
 }
 
-.test-card-header h3 {
+.test-col {
 	display: flex;
+	flex-direction: column;
+	gap: 2px;
 	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.test-col-title h3 {
+	display: flex;
 	flex-direction: column;
 	gap: 4px;
 	margin: 0;
@@ -270,7 +284,6 @@
 	font-size: 0.98rem;
 	font-weight: 800;
 	line-height: 1.35;
-	overflow-wrap: anywhere;
 }
 
 .test-type {
@@ -286,59 +299,23 @@
 	width: fit-content;
 }
 
-.test-card-body {
-	grid-area: body;
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	align-items: center;
-	gap: 12px;
-	min-width: 0;
-	margin: 0;
-	padding-top: 13px;
-	border-top: 1px solid #eef4ef;
-}
-
-.test-card-body p {
-	display: flex;
-	min-width: 0;
-	flex-direction: column;
-	gap: 2px;
-	margin: 0;
+.col-primary {
 	color: #31543c;
 	font-size: 0.82rem;
 	font-weight: 700;
 	line-height: 1.4;
-	overflow-wrap: anywhere;
 }
 
-.test-card-body p strong,
-.test-cell-status strong {
-	color: #8a9c8e;
-	font-size: 0.64rem;
-	font-weight: 800;
-	letter-spacing: 0.04em;
-}
-
-.test-card-body p small {
+.col-secondary {
 	color: #7a8c7e;
 	font-size: 0.72rem;
 	font-weight: 600;
 }
 
-.test-cell-status {
-	display: flex;
-	flex-direction: column;
-	gap: 2px;
-}
-
-.test-card-actions-menu {
-	grid-area: actions;
+.test-col-actions {
 	position: relative;
 	z-index: 5;
-	display: flex;
-	flex: 0 0 auto;
-	align-items: center;
-	justify-content: flex-end;
+	align-items: flex-end;
 }
 
 .test-card-actions-menu .menu-trigger-btn {
@@ -415,10 +392,12 @@
 	z-index: 100;
 }
 
+/* Desktop row geometry (1000px and up) */
 @media (min-width: 1000px) {
 	.test-card {
+		display: grid;
 		grid-template-columns: var(--test-cols);
-		grid-template-areas: none;
+		align-items: center;
 		gap: 0 16px;
 		min-height: 68px;
 		padding: 10px 18px;
@@ -430,30 +409,8 @@
 		bottom: 10px;
 	}
 
-	.test-card-header,
-	.test-card-body,
-	.test-card-actions-menu,
-	.test-card-body p,
-	.test-cell-status {
-		grid-area: auto;
-	}
-
-	.test-card-body {
-		display: grid;
-		grid-column: 2 / 6;
-		grid-template-columns: subgrid;
-		gap: 0 16px;
-		padding-top: 0;
-		border-top: 0;
-	}
-
-	.test-card-body p strong,
-	.test-cell-status strong {
+	.mobile-label {
 		display: none;
-	}
-
-	.test-card-body p {
-		font-size: 0.8rem;
 	}
 }
 
@@ -999,18 +956,6 @@
 	text-align: center;
 }
 
-@media (max-width: 1050px) {
-	.test-management .filters {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-	.test-management .filters input {
-		grid-column: 1 / -1;
-	}
-	.per-page-selector {
-		justify-content: flex-start;
-	}
-}
-
 @media (max-width: 768px) {
 	.test-management {
 		padding: 30px 14px 48px;
@@ -1019,22 +964,20 @@
 		align-items: stretch;
 		flex-direction: column;
 	}
-	.test-management-header::before {
-		margin-top: -56px;
-	}
 	.add-test-btn {
 		width: 100%;
 	}
 	.test-management .filters {
-		grid-template-columns: 1fr;
+		flex-direction: column;
+		align-items: stretch;
 	}
-	.test-management .filters input {
-		grid-column: auto;
+	.test-management .filters input,
+	.test-management .filters select {
+		width: 100%;
+		flex: none;
 	}
-	.per-page-selector {
-		justify-content: space-between;
-	}
-	.results-count {
+	.test-management .results-count {
+		margin-inline-start: 0;
 		text-align: center;
 	}
 	.pagination-info {

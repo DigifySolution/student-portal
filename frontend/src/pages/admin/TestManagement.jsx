@@ -127,7 +127,12 @@ const TestManagement = () => {
 		if (openMenuTestId === null) return;
 
 		const closeOnOutside = (event) => {
-			if (!event.target.closest(".test-actions")) setOpenMenuTestId(null);
+			if (
+				!event.target.closest(".test-card-actions-menu") &&
+				!event.target.closest(".test-actions-dropdown")
+			) {
+				setOpenMenuTestId(null);
+			}
 		};
 		const closeOnEscape = (event) => {
 			if (event.key === "Escape") setOpenMenuTestId(null);
@@ -470,7 +475,10 @@ const TestManagement = () => {
 	return (
 		<div className="test-management">
 			<div className="test-management-header">
-				<h1>إدارة الاختبارات</h1>
+				<div className="test-management-header-title">
+					<span className="subtitle">اختبارات الأكاديمية</span>
+					<h1>إدارة الاختبارات</h1>
+				</div>
 				<button
 					className="add-test-btn"
 					onClick={() => setShowCreateModal(true)}
@@ -558,7 +566,9 @@ const TestManagement = () => {
 								key={test.id}
 								className={`test-card ${isFinishedTest(test) ? "is-finished" : ""}`}
 							>
-								<div className="test-card-header">
+								{/* Col 1: Title & Type */}
+								<div className="test-col test-col-title">
+									<strong className="mobile-label">الاختبار</strong>
 									<h3>
 										{test.title}
 										<span className="test-type">
@@ -567,56 +577,60 @@ const TestManagement = () => {
 									</h3>
 								</div>
 
-								<div className="test-card-body">
-									<p>
-										<strong>الصف والمجموعة</strong>
-										<span>{getGradeLabel(test.grade)}</span>
-										<small>
-											{test.student_group
-												? getGroupLabel(test.student_group)
-												: "كل الطلاب"}
-										</small>
-									</p>
-
-									<p>
-										<strong>التوقيت</strong>
-										<span>{formatDate(test.start_time)}</span>
-										<small>
-											{test.duration_minutes
-												? `${test.duration_minutes} دقيقة`
-												: "المدة غير محددة"}
-										</small>
-									</p>
-
-									<div className="test-cell-status">
-										<strong>الحالة</strong>
-										<CountdownTimer
-											startTimeMs={test.start_time_ms}
-											endTimeMs={test.end_time_ms}
-										/>
-									</div>
-
-									<p>
-										<strong>المشاركات</strong>
-										<span>
-											{test.submission_count || 0} مشارك · {test.graded_count || 0} مُصحح
-										</span>
-										<small>
-											{test.images ? test.images.length : 0} صورة
-											{test.view_permission ? " · النتائج ظاهرة" : ""}
-										</small>
-									</p>
+								{/* Col 2: Grade & Group */}
+								<div className="test-col test-col-group">
+									<strong className="mobile-label">الصف والمجموعة</strong>
+									<span className="col-primary">{getGradeLabel(test.grade)}</span>
+									<small className="col-secondary">
+										{test.student_group
+											? getGroupLabel(test.student_group)
+											: "كل الطلاب"}
+									</small>
 								</div>
 
-								<div className="test-card-actions-menu">
+								{/* Col 3: Timing */}
+								<div className="test-col test-col-time">
+									<strong className="mobile-label">التوقيت</strong>
+									<span className="col-primary">{formatDate(test.start_time)}</span>
+									<small className="col-secondary">
+										{test.duration_minutes
+											? `${test.duration_minutes} دقيقة`
+											: "المدة غير محددة"}
+									</small>
+								</div>
+
+								{/* Col 4: Status / Countdown */}
+								<div className="test-col test-col-status">
+									<strong className="mobile-label">الحالة</strong>
+									<CountdownTimer
+										startTimeMs={test.start_time_ms}
+										endTimeMs={test.end_time_ms}
+									/>
+								</div>
+
+								{/* Col 5: Submissions */}
+								<div className="test-col test-col-submissions">
+									<strong className="mobile-label">المشاركات</strong>
+									<span className="col-primary">
+										{test.submission_count || 0} مشارك · {test.graded_count || 0} مُصحح
+									</span>
+									<small className="col-secondary">
+										{test.images ? test.images.length : 0} صورة
+										{test.view_permission ? " · النتائج ظاهرة" : ""}
+									</small>
+								</div>
+
+								{/* Col 6: Actions Menu */}
+								<div className="test-col test-col-actions test-card-actions-menu">
 									<button
 										type="button"
 										className="menu-trigger-btn"
-										onClick={() =>
+										onClick={(e) => {
+											e.stopPropagation();
 											setOpenMenuTestId((current) =>
 												current === test.id ? null : test.id,
-											)
-										}
+											);
+										}}
 										title="قائمة الإجراءات"
 										aria-expanded={openMenuTestId === test.id}
 										aria-haspopup="menu"
