@@ -1,6 +1,4 @@
-import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
-import { Button, Modal } from "react-bootstrap";
 import {
 	FaChevronLeft,
 	FaChevronRight,
@@ -109,6 +107,10 @@ const TestManagement = () => {
 	const [testTypeFilter, setTestTypeFilter] = useState("");
 	const [showFinished, setShowFinished] = useState(false);
 	const [now, setNow] = useState(Date.now());
+
+	// Pagination state
+	const [currentPage, setCurrentPage] = useState(1);
+	const [itemsPerPage, setItemsPerPage] = useState(12);
 
 	useEffect(() => {
 		fetchTests();
@@ -315,6 +317,44 @@ const TestManagement = () => {
 		});
 	}, [tests, searchTerm, gradeFilter, testTypeFilter, showFinished, now]);
 
+	// Reset to first page when filters change
+	useEffect(() => {
+		setCurrentPage(1);
+	}, [searchTerm, gradeFilter, testTypeFilter, showFinished, itemsPerPage]);
+
+	// Pagination calculations
+	const totalPages = Math.ceil(filteredTests.length / itemsPerPage);
+	const startIndex = (currentPage - 1) * itemsPerPage;
+	const endIndex = startIndex + itemsPerPage;
+	const paginatedTests = filteredTests.slice(startIndex, endIndex);
+
+	// Generate page numbers for pagination
+	const getPageNumbers = () => {
+		const pages = [];
+		const maxVisiblePages = 5;
+
+		if (totalPages <= maxVisiblePages) {
+			for (let i = 1; i <= totalPages; i++) pages.push(i);
+		} else {
+			if (currentPage <= 3) {
+				for (let i = 1; i <= 4; i++) pages.push(i);
+				pages.push("...");
+				pages.push(totalPages);
+			} else if (currentPage >= totalPages - 2) {
+				pages.push(1);
+				pages.push("...");
+				for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
+			} else {
+				pages.push(1);
+				pages.push("...");
+				for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i);
+				pages.push("...");
+				pages.push(totalPages);
+			}
+		}
+		return pages;
+	};
+
 	const clearTestFilters = () => {
 		setSearchTerm("");
 		setGradeFilter("");
@@ -428,125 +468,102 @@ const TestManagement = () => {
 
 	return (
 		<div className="test-management">
-			<div className="page-header">
+			<div className="test-management-header">
 				<h1>إدارة الاختبارات</h1>
 				<button
-					className="btn-primary"
+					className="add-test-btn"
 					onClick={() => setShowCreateModal(true)}
 					type="button"
 				>
-					إضافة اختبار جديد
+					+ إضافة اختبار جديد
 				</button>
 			</div>
 
-			<div className="test-library-toolbar">
-				<div className="test-library-search">
-					<FaSearch aria-hidden="true" />
-					<input
-						aria-label="البحث في الاختبارات"
-						placeholder="ابحث باسم الاختبار أو الصف أو المجموعة..."
-						value={searchTerm}
-						onChange={(event) => setSearchTerm(event.target.value)}
-						type="search"
-					/>
-				</div>
+			<div className="filters">
+				<input
+					type="text"
+					placeholder="ابحث باسم الاختبار أو الصف أو المجموعة..."
+					value={searchTerm}
+					onChange={(event) => setSearchTerm(event.target.value)}
+				/>
+				<select
+					value={gradeFilter}
+					onChange={(event) => setGradeFilter(event.target.value)}
+				>
+					<option value="">جميع الصفوف</option>
+					<option value="3MIDDLE">الصف الثالث الإعدادي</option>
+					<option value="1HIGH">الصف الأول الثانوي</option>
+					<option value="2HIGH">الصف الثاني الثانوي</option>
+					<option value="3HIGH">الصف الثالث الثانوي</option>
+				</select>
+				<select
+					value={testTypeFilter}
+					onChange={(event) => setTestTypeFilter(event.target.value)}
+				>
+					<option value="">جميع الأنواع</option>
+					<option value="MCQ">اختيار من متعدد</option>
+					<option value="BUBBLE_SHEET">بابل إلكتروني</option>
+					<option value="PHYSICAL_SHEET">بابل حقيقي</option>
+				</select>
 				<label className="test-finished-toggle">
 					<input
 						checked={showFinished}
 						onChange={(event) => setShowFinished(event.target.checked)}
 						type="checkbox"
 					/>
-					<span className="test-finished-toggle__track">
-						<span />
-					</span>
-					<span>عرض الاختبارات المنتهية</span>
+					<span>عرض المنتهية</span>
 				</label>
-				<select
-					aria-label="تصفية حسب الصف"
-					value={gradeFilter}
-					onChange={(event) => setGradeFilter(event.target.value)}
-				>
-					<option value="">كل الصفوف</option>
-					<option value="3MIDDLE">الثالث الإعدادي</option>
-					<option value="1HIGH">الأول الثانوي</option>
-					<option value="2HIGH">الثاني الثانوي</option>
-					<option value="3HIGH">الثالث الثانوي</option>
-				</select>
-				<select
-					aria-label="تصفية حسب النوع"
-					value={testTypeFilter}
-					onChange={(event) => setTestTypeFilter(event.target.value)}
-				>
-					<option value="">كل الأنواع</option>
-					<option value="MCQ">اختيار من متعدد</option>
-					<option value="BUBBLE_SHEET">بابل إلكتروني</option>
-					<option value="PHYSICAL_SHEET">بابل حقيقي</option>
-				</select>
+				<div className="per-page-selector">
+					<label>عرض:</label>
+					<select
+						value={itemsPerPage}
+						onChange={(e) => setItemsPerPage(Number(e.target.value))}
+					>
+						<option value={6}>6</option>
+						<option value={12}>12</option>
+						<option value={24}>24</option>
+						<option value={48}>48</option>
+						<option value={100}>100</option>
+					</select>
+					<span>لكل صفحة</span>
+				</div>
 				<button
 					className="test-filter-reset"
 					onClick={clearTestFilters}
 					type="button"
+					title="مسح الفلاتر"
 				>
 					<span className="material-symbols-outlined">filter_alt_off</span>
 					مسح
 				</button>
-			</div>
-			<div className="test-library-summary">
-				<span>
-					<strong>{filteredTests.length}</strong> اختبار ظاهر
-				</span>
-				{showFinished ? (
-					<span className="test-library-summary__mode">
-						يشمل الاختبارات المنتهية
-					</span>
-				) : (
-					<span className="test-library-summary__mode">
-						الاختبارات المنتهية مخفية تلقائياً
-					</span>
-				)}
+				<div className="results-count">
+					إجمالي: {filteredTests.length} اختبار
+				</div>
 			</div>
 
-			{/* Tests Table */}
-			<div className="tests-grid">
-				{filteredTests.length === 0 ? (
-					<div className="no-tests">
-						<span className="material-symbols-outlined">search_off</span>
-						<p>
-							{tests.length === 0
-								? "لا توجد اختبارات"
-								: "لا توجد اختبارات مطابقة للفلاتر الحالية"}
-						</p>
-						{tests.length > 0 ? (
-							<button
-								className="test-filter-reset"
-								onClick={clearTestFilters}
-								type="button"
-							>
-								إظهار كل الاختبارات
-							</button>
-						) : null}
+			{paginatedTests.length > 0 ? (
+				<div className="test-table-wrap">
+					<div className="test-table-head" aria-hidden="true">
+						<span>الاختبار</span>
+						<span>الصف والمجموعة</span>
+						<span>التوقيت</span>
+						<span>الحالة</span>
+						<span>المشاركات</span>
+						<span />
 					</div>
-				) : (
-					<>
-						<div className="test-table-head" aria-hidden="true">
-							<span>الاختبار</span>
-							<span>الصف والمجموعة</span>
-							<span>التوقيت</span>
-							<span>الحالة</span>
-							<span>المشاركات</span>
-							<span />
-						</div>
-
-						{filteredTests.map((test) => (
+					<div className="test-list">
+						{paginatedTests.map((test) => (
 							<div
 								key={test.id}
 								className={`test-card ${isFinishedTest(test) ? "is-finished" : ""}`}
 							>
-								<div className="test-header">
-									<h3>{test.title}</h3>
-									<span className="test-type">
-										{getTestTypeLabel(test.test_type)}
-									</span>
+								<div className="test-card-header">
+									<h3>
+										{test.title}
+										<span className="test-type">
+											{getTestTypeLabel(test.test_type)}
+										</span>
+									</h3>
 								</div>
 
 								<div className="test-card-body">
@@ -581,8 +598,7 @@ const TestManagement = () => {
 									<p>
 										<strong>المشاركات</strong>
 										<span>
-											{test.submission_count || 0} مشارك ·{" "}
-											{test.graded_count || 0} مُصحح
+											{test.submission_count || 0} مشارك · {test.graded_count || 0} مُصحح
 										</span>
 										<small>
 											{test.images ? test.images.length : 0} صورة
@@ -591,142 +607,203 @@ const TestManagement = () => {
 									</p>
 								</div>
 
-								<div className="test-actions">
-								<button
-									aria-expanded={openMenuTestId === test.id}
-									aria-haspopup="menu"
-									aria-label="قائمة إجراءات الاختبار"
-									className="test-menu-trigger"
-									onClick={() =>
-										setOpenMenuTestId((current) =>
-											current === test.id ? null : test.id,
-										)
-									}
-									type="button"
-								>
-									<span className="material-symbols-outlined">more_horiz</span>
-								</button>
-
-								{openMenuTestId === test.id ? (
-									<div className="test-actions-dropdown" role="menu">
-										<button
-											onClick={() => {
-												setOpenMenuTestId(null);
-												viewSubmissions(test);
-											}}
-											role="menuitem"
-											type="button"
-										>
-											<span className="material-symbols-outlined">
-												fact_check
-											</span>
-											عرض المشاركات
-										</button>
-
-										{test.images && test.images.length > 0 ? (
+								<div className="test-card-actions-menu">
+									<button
+										type="button"
+										className="menu-trigger-btn"
+										onClick={() =>
+											setOpenMenuTestId((current) =>
+												current === test.id ? null : test.id,
+											)
+										}
+										title="قائمة الإجراءات"
+										aria-expanded={openMenuTestId === test.id}
+										aria-haspopup="menu"
+									>
+										⋯
+									</button>
+									{openMenuTestId === test.id && (
+										<div className="test-actions-dropdown">
 											<button
+												type="button"
 												onClick={() => {
 													setOpenMenuTestId(null);
-													openImageModal(test);
+													viewSubmissions(test);
 												}}
-												role="menuitem"
-												type="button"
+												className="dropdown-action-btn"
 											>
-												<span className="material-symbols-outlined">
-													imagesmode
-												</span>
-												عرض الصور ({test.images.length})
+												<span className="material-symbols-outlined">fact_check</span>
+												عرض المشاركات
 											</button>
-										) : null}
 
-										{test.images && test.images.length > 0 ? (
+											{test.images && test.images.length > 0 && (
+												<button
+													type="button"
+													onClick={() => {
+														setOpenMenuTestId(null);
+														openImageModal(test);
+													}}
+													className="dropdown-action-btn"
+												>
+													<span className="material-symbols-outlined">imagesmode</span>
+													عرض الصور ({test.images.length})
+												</button>
+											)}
+
+											{test.images && test.images.length > 0 && (
+												<button
+													type="button"
+													disabled={pdfProgress !== null}
+													onClick={() => {
+														setOpenMenuTestId(null);
+														downloadTestAsPDF(test);
+													}}
+													className="dropdown-action-btn"
+												>
+													<span className="material-symbols-outlined">picture_as_pdf</span>
+													{pdfProgress && pdfProgress.testId === test.id
+														? `جاري التحميل (${pdfProgress.current}/${pdfProgress.total})`
+														: "تحميل PDF"}
+												</button>
+											)}
+
 											<button
-												disabled={pdfProgress !== null}
+												type="button"
 												onClick={() => {
 													setOpenMenuTestId(null);
-													downloadTestAsPDF(test);
+													toggleViewPermission(test.id, test.view_permission);
 												}}
-												role="menuitem"
-												type="button"
+												className="dropdown-action-btn"
 											>
 												<span className="material-symbols-outlined">
-													picture_as_pdf
+													{test.view_permission ? "visibility_off" : "visibility"}
 												</span>
-												{pdfProgress && pdfProgress.testId === test.id
-													? `جاري التحميل (${pdfProgress.current}/${pdfProgress.total})`
-													: "تحميل PDF"}
+												{test.view_permission ? "إخفاء النتائج" : "إظهار النتائج"}
 											</button>
-										) : null}
 
-										<button
-											onClick={() => {
-												setOpenMenuTestId(null);
-												toggleViewPermission(test.id, test.view_permission);
-											}}
-											role="menuitem"
-											type="button"
-										>
-											<span className="material-symbols-outlined">
-												{test.view_permission ? "visibility_off" : "visibility"}
-											</span>
-											{test.view_permission
-												? "إخفاء النتائج"
-												: "إظهار النتائج"}
-										</button>
+											{test.view_type === "TEACHER_CONTROLLED" && (
+												<button
+													type="button"
+													onClick={() => {
+														setOpenMenuTestId(null);
+														toggleShowGradeOutside(
+															test.id,
+															test.show_grade_outside,
+														);
+													}}
+													className="dropdown-action-btn"
+												>
+													<span className="material-symbols-outlined">grade</span>
+													{test.show_grade_outside ? "إخفاء الدرجة" : "إظهار الدرجة"}
+												</button>
+											)}
 
-										{test.view_type === "TEACHER_CONTROLLED" ? (
 											<button
+												type="button"
 												onClick={() => {
 													setOpenMenuTestId(null);
-													toggleShowGradeOutside(
-														test.id,
-														test.show_grade_outside,
-													);
+													setEditingTest(test);
 												}}
-												role="menuitem"
-												type="button"
+												className="dropdown-action-btn"
 											>
-												<span className="material-symbols-outlined">
-													grade
-												</span>
-												{test.show_grade_outside
-													? "إخفاء الدرجة"
-													: "إظهار الدرجة"}
+												<span className="material-symbols-outlined">edit</span>
+												تعديل
 											</button>
-										) : null}
 
-										<button
-											onClick={() => {
-												setOpenMenuTestId(null);
-												setEditingTest(test);
-											}}
-											role="menuitem"
-											type="button"
-										>
-											<span className="material-symbols-outlined">edit</span>
-											تعديل
-										</button>
-
-										<button
-											className="is-danger"
-											onClick={() => {
-												setOpenMenuTestId(null);
-												deleteTest(test.id);
-											}}
-											role="menuitem"
-											type="button"
-										>
-											<span className="material-symbols-outlined">delete</span>
-											حذف
-										</button>
-									</div>
-								) : null}
+											<button
+												type="button"
+												className="dropdown-action-btn danger"
+												onClick={() => {
+													setOpenMenuTestId(null);
+													deleteTest(test.id);
+												}}
+											>
+												<span className="material-symbols-outlined">delete</span>
+												حذف
+											</button>
+										</div>
+									)}
 								</div>
 							</div>
 						))}
-					</>
-				)}
-			</div>
+					</div>
+				</div>
+			) : (
+				<div className="no-tests">
+					<span className="material-symbols-outlined">search_off</span>
+					<p>
+						{tests.length === 0
+							? "لا توجد اختبارات"
+							: "لا توجد اختبارات مطابقة للفلاتر الحالية"}
+					</p>
+					{tests.length > 0 ? (
+						<button
+							className="test-filter-reset"
+							onClick={clearTestFilters}
+							type="button"
+						>
+							إظهار كل الاختبارات
+						</button>
+					) : null}
+				</div>
+			)}
+
+			{/* Pagination Controls */}
+			{totalPages > 1 && (
+				<div className="pagination">
+					<button
+						className="pagination-btn"
+						onClick={() => setCurrentPage(1)}
+						disabled={currentPage === 1}
+					>
+						الأولى
+					</button>
+					<button
+						className="pagination-btn"
+						onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+						disabled={currentPage === 1}
+					>
+						السابق
+					</button>
+
+					<div className="pagination-pages">
+						{getPageNumbers().map((page, index) =>
+							page === "..." ? (
+								<span key={`ellipsis-${index}`} className="pagination-ellipsis">
+									...
+								</span>
+							) : (
+								<button
+									key={page}
+									className={`pagination-page ${currentPage === page ? "active" : ""}`}
+									onClick={() => setCurrentPage(page)}
+								>
+									{page}
+								</button>
+							),
+						)}
+					</div>
+
+					<button
+						className="pagination-btn"
+						onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+						disabled={currentPage === totalPages}
+					>
+						التالي
+					</button>
+					<button
+						className="pagination-btn"
+						onClick={() => setCurrentPage(totalPages)}
+						disabled={currentPage === totalPages}
+					>
+						الأخيرة
+					</button>
+
+					<span className="pagination-info">
+						صفحة {currentPage} من {totalPages}
+					</span>
+				</div>
+			)}
 
 			{/* Create/Edit Test Modal */}
 			{(showCreateModal || editingTest) && (
@@ -754,83 +831,92 @@ const TestManagement = () => {
 				/>
 			)}
 
-			{/* Export Modal - rendered at top-level where showExportModal state is defined */}
+			{/* Export Modal */}
 			{showExportModal && (
 				<ExportModal tests={tests} onClose={() => setShowExportModal(false)} />
 			)}
 
 			{/* Image Viewer Modal */}
-			{currentTest && (
-				<Modal
-					show={showImageModal}
-					onHide={() => setShowImageModal(false)}
-					size="lg"
-					centered
-					className="image-viewer-modal"
+			{showImageModal && currentTest && (
+				<div
+					className="modal-overlay image-viewer-overlay"
+					onClick={() => setShowImageModal(false)}
 				>
-					<Modal.Header closeButton>
-						<Modal.Title>{currentTest.title} - معاينة الأسئلة</Modal.Title>
-					</Modal.Header>
-					<Modal.Body className="text-center">
-						<div className="image-viewer-container">
+					<div
+						className="modal-content image-viewer-modal-content"
+						onClick={(e) => e.stopPropagation()}
+					>
+						<div className="modal-header">
+							<h2>{currentTest.title} - معاينة الأسئلة</h2>
 							<button
-								className="nav-arrow left-arrow"
-								onClick={handlePrevImage}
-								disabled={currentTest.images.length <= 1}
+								type="button"
+								className="close-btn"
+								onClick={() => setShowImageModal(false)}
 							>
-								<FaChevronLeft size={24} />
-							</button>
-
-							<div className="image-container">
-								{currentTest.images.length > 0 ? (
-									<>
-										<img
-											src={`${window.location.origin}/${currentTest.images[currentImageIndex].image_path}`}
-											alt={`صفحة ${currentImageIndex + 1}`}
-											className="img-fluid"
-										/>
-										<div className="image-counter">
-											{currentImageIndex + 1} / {currentTest.images.length}
-										</div>
-									</>
-								) : (
-									<div className="no-images">لا توجد صور متاحة</div>
-								)}
-							</div>
-
-							<button
-								className="nav-arrow right-arrow"
-								onClick={handleNextImage}
-								disabled={currentTest.images.length <= 1}
-							>
-								<FaChevronRight size={24} />
+								×
 							</button>
 						</div>
-					</Modal.Body>
-					<Modal.Footer>
-						<div className="d-flex justify-content-between w-100">
-							<div>
-								{currentTest.images.length > 0 && (
-									<button
-										className="btn btn-danger"
-										onClick={() => {
-											deleteImage(currentTest.images[currentImageIndex].id);
-											setShowImageModal(false);
-										}}
-									>
-										<FaTimes className="me-1" /> حذف الصورة الحالية
-									</button>
-								)}
+						<div className="modal-body text-center">
+							<div className="image-viewer-container">
+								<button
+									type="button"
+									className="nav-arrow left-arrow"
+									onClick={handlePrevImage}
+									disabled={currentTest.images.length <= 1}
+								>
+									<FaChevronLeft size={24} />
+								</button>
+
+								<div className="image-container">
+									{currentTest.images.length > 0 ? (
+										<>
+											<img
+												src={`${window.location.origin}/${currentTest.images[currentImageIndex].image_path}`}
+												alt={`صفحة ${currentImageIndex + 1}`}
+												className="img-fluid"
+											/>
+											<div className="image-counter">
+												{currentImageIndex + 1} / {currentTest.images.length}
+											</div>
+										</>
+									) : (
+										<div className="no-images">لا توجد صور متاحة</div>
+									)}
+								</div>
+
+								<button
+									type="button"
+									className="nav-arrow right-arrow"
+									onClick={handleNextImage}
+									disabled={currentTest.images.length <= 1}
+								>
+									<FaChevronRight size={24} />
+								</button>
 							</div>
+						</div>
+						<div className="modal-actions">
+							{currentTest.images.length > 0 && (
+								<button
+									type="button"
+									className="cancel-btn danger-btn"
+									onClick={() => {
+										deleteImage(currentTest.images[currentImageIndex].id);
+										setShowImageModal(false);
+									}}
+								>
+									<FaTimes style={{ marginLeft: "4px" }} /> حذف الصورة الحالية
+								</button>
+							)}
 							<button
-								className="btn btn-secondary"
+								type="button"
+								className="cancel-btn"
 								onClick={() => setShowImageModal(false)}
 							>
 								إغلاق
 							</button>
 						</div>
-					</Modal.Footer>
-				</Modal>
+					</div>
+				</div>
 			)}
 		</div>
 	);

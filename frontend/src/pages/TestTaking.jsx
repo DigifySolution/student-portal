@@ -1100,8 +1100,7 @@ const TestTaking = () => {
 
 						// Get static base URL for images (without /api suffix)
 						const API_BASE =
-							import.meta.env.VITE_STATIC_BASE_URL ||
-							"https://marwahashem.com";
+							import.meta.env.VITE_STATIC_BASE_URL || "https://marwahashem.com";
 						const image = test.images?.find(
 							(img) => img.display_order === question.media_index,
 						);

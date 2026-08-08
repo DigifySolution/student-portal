@@ -182,8 +182,7 @@ const TestResult = () => {
 
 		const correctAnswers = result.correct_answers_visible.answers;
 		const API_BASE =
-			import.meta?.env?.VITE_STATIC_BASE_URL ||
-			"https://marwahashem.com";
+			import.meta?.env?.VITE_STATIC_BASE_URL || "https://marwahashem.com";
 
 		const imgSrc = studentAnswers?.bubble_image_path
 			? `${API_BASE}/${studentAnswers.bubble_image_path}`
@@ -256,8 +255,7 @@ const TestResult = () => {
 
 		// Get test images to display with questions
 		const API_BASE =
-			import.meta.env.VITE_STATIC_BASE_URL ||
-			"https://marwahashem.com";
+			import.meta.env.VITE_STATIC_BASE_URL || "https://marwahashem.com";
 
 		return (
 			<div className="answers-comparison">

@@ -1,7 +1,6 @@
 import { Router } from "express";
 import studentController from "../controllers/studentController";
-import { authenticateToken, requireAdmin, requireStudent, } from "../middleware/auth";
-import { validateStudentId } from "../middleware/validation";
+import { authenticateToken, requireStudent, } from "../middleware/auth";
 const router = Router();
 router.use(authenticateToken);
 router.get("/dashboard", requireStudent, studentController.getDashboard);
