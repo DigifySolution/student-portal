@@ -577,47 +577,50 @@ const TestManagement = () => {
 									</h3>
 								</div>
 
-								{/* Col 2: Grade & Group */}
-								<div className="test-col test-col-group">
-									<strong className="mobile-label">الصف والمجموعة</strong>
-									<span className="col-primary">{getGradeLabel(test.grade)}</span>
-									<small className="col-secondary">
-										{test.student_group
-											? getGroupLabel(test.student_group)
-											: "كل الطلاب"}
-									</small>
-								</div>
+								{/* Mobile body wrapper for cols 2..5 */}
+								<div className="test-card-body-wrap">
+									{/* Col 2: Grade & Group */}
+									<div className="test-col test-col-group">
+										<strong className="mobile-label">الصف والمجموعة</strong>
+										<span className="col-primary">{getGradeLabel(test.grade)}</span>
+										<small className="col-secondary">
+											{test.student_group
+												? getGroupLabel(test.student_group)
+												: "كل الطلاب"}
+										</small>
+									</div>
 
-								{/* Col 3: Timing */}
-								<div className="test-col test-col-time">
-									<strong className="mobile-label">التوقيت</strong>
-									<span className="col-primary">{formatDate(test.start_time)}</span>
-									<small className="col-secondary">
-										{test.duration_minutes
-											? `${test.duration_minutes} دقيقة`
-											: "المدة غير محددة"}
-									</small>
-								</div>
+									{/* Col 3: Timing */}
+									<div className="test-col test-col-time">
+										<strong className="mobile-label">التوقيت</strong>
+										<span className="col-primary">{formatDate(test.start_time)}</span>
+										<small className="col-secondary">
+											{test.duration_minutes
+												? `${test.duration_minutes} دقيقة`
+												: "المدة غير محددة"}
+										</small>
+									</div>
 
-								{/* Col 4: Status / Countdown */}
-								<div className="test-col test-col-status">
-									<strong className="mobile-label">الحالة</strong>
-									<CountdownTimer
-										startTimeMs={test.start_time_ms}
-										endTimeMs={test.end_time_ms}
-									/>
-								</div>
+									{/* Col 4: Status / Countdown */}
+									<div className="test-col test-col-status">
+										<strong className="mobile-label">الحالة</strong>
+										<CountdownTimer
+											startTimeMs={test.start_time_ms}
+											endTimeMs={test.end_time_ms}
+										/>
+									</div>
 
-								{/* Col 5: Submissions */}
-								<div className="test-col test-col-submissions">
-									<strong className="mobile-label">المشاركات</strong>
-									<span className="col-primary">
-										{test.submission_count || 0} مشارك · {test.graded_count || 0} مُصحح
-									</span>
-									<small className="col-secondary">
-										{test.images ? test.images.length : 0} صورة
-										{test.view_permission ? " · النتائج ظاهرة" : ""}
-									</small>
+									{/* Col 5: Submissions */}
+									<div className="test-col test-col-submissions">
+										<strong className="mobile-label">المشاركات</strong>
+										<span className="col-primary">
+											{test.submission_count || 0} مشارك · {test.graded_count || 0} مُصحح
+										</span>
+										<small className="col-secondary">
+											{test.images ? test.images.length : 0} صورة
+											{test.view_permission ? " · النتائج ظاهرة" : ""}
+										</small>
+									</div>
 								</div>
 
 								{/* Col 6: Actions Menu */}
