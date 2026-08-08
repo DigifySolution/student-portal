@@ -103,9 +103,19 @@ const TestManagement = () => {
 	const [currentTest, setCurrentTest] = useState(null);
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const [pdfProgress, setPdfProgress] = useState(null);
+	const [searchTerm, setSearchTerm] = useState("");
+	const [gradeFilter, setGradeFilter] = useState("");
+	const [testTypeFilter, setTestTypeFilter] = useState("");
+	const [showFinished, setShowFinished] = useState(false);
+	const [now, setNow] = useState(Date.now());
 
 	useEffect(() => {
 		fetchTests();
+	}, []);
+
+	useEffect(() => {
+		const interval = setInterval(() => setNow(Date.now()), 30000);
+		return () => clearInterval(interval);
 	}, []);
 
 	const fetchTests = async () => {
@@ -258,6 +268,39 @@ const TestManagement = () => {
 		}
 	};
 
+	const isFinishedTest = (test) => {
+		const endTime = test.end_time_ms
+			? Number(test.end_time_ms)
+			: Date.parse(test.end_time || "");
+		return Number.isFinite(endTime) && endTime <= now;
+	};
+
+	const filteredTests = React.useMemo(() => {
+		const query = searchTerm.trim().toLowerCase();
+
+		return tests.filter((test) => {
+			if (!showFinished && isFinishedTest(test)) return false;
+			if (gradeFilter && test.grade !== gradeFilter) return false;
+			if (testTypeFilter && test.test_type !== testTypeFilter) return false;
+
+			if (!query) return true;
+			return [
+				test.title,
+				getGradeLabel(test.grade),
+				getGroupLabel(test.student_group),
+				getTestTypeLabel(test.test_type),
+			]
+				.filter(Boolean)
+				.some((value) => String(value).toLowerCase().includes(query));
+		});
+	}, [tests, searchTerm, gradeFilter, testTypeFilter, showFinished, now]);
+
+	const clearTestFilters = () => {
+		setSearchTerm("");
+		setGradeFilter("");
+		setTestTypeFilter("");
+	};
+
 	const viewSubmissions = (test) => {
 		setSelectedTest(test);
 		fetchSubmissions(test.id);
@@ -280,7 +323,11 @@ const TestManagement = () => {
 				ctx.drawImage(img, 0, 0);
 				try {
 					const dataURL = canvas.toDataURL("image/jpeg", 0.9);
-					resolve({ dataURL, width: img.naturalWidth, height: img.naturalHeight });
+					resolve({
+						dataURL,
+						width: img.naturalWidth,
+						height: img.naturalHeight,
+					});
 				} catch (err) {
 					reject(err);
 				}
@@ -304,8 +351,7 @@ const TestManagement = () => {
 
 		try {
 			const API_BASE =
-				import.meta.env.VITE_STATIC_BASE_URL ||
-				"https://marwahashem.com";
+				import.meta.env.VITE_STATIC_BASE_URL || "https://marwahashem.com";
 
 			const sortedImages = [...test.images].sort(
 				(a, b) => (a.display_order || 0) - (b.display_order || 0),
@@ -339,7 +385,10 @@ const TestManagement = () => {
 			for (let i = 0; i < loadedImages.length; i++) {
 				const img = loadedImages[i];
 				if (i > 0) {
-					doc.addPage([img.width, img.height], img.width > img.height ? "l" : "p");
+					doc.addPage(
+						[img.width, img.height],
+						img.width > img.height ? "l" : "p",
+					);
 				}
 				doc.addImage(img.dataURL, "JPEG", 0, 0, img.width, img.height);
 			}
@@ -376,15 +425,99 @@ const TestManagement = () => {
 				</button>
 			</div>
 
+			<div className="test-library-toolbar">
+				<div className="test-library-search">
+					<FaSearch aria-hidden="true" />
+					<input
+						aria-label="البحث في الاختبارات"
+						placeholder="ابحث باسم الاختبار أو الصف أو المجموعة..."
+						value={searchTerm}
+						onChange={(event) => setSearchTerm(event.target.value)}
+						type="search"
+					/>
+				</div>
+				<label className="test-finished-toggle">
+					<input
+						checked={showFinished}
+						onChange={(event) => setShowFinished(event.target.checked)}
+						type="checkbox"
+					/>
+					<span className="test-finished-toggle__track">
+						<span />
+					</span>
+					<span>عرض الاختبارات المنتهية</span>
+				</label>
+				<select
+					aria-label="تصفية حسب الصف"
+					value={gradeFilter}
+					onChange={(event) => setGradeFilter(event.target.value)}
+				>
+					<option value="">كل الصفوف</option>
+					<option value="3MIDDLE">الثالث الإعدادي</option>
+					<option value="1HIGH">الأول الثانوي</option>
+					<option value="2HIGH">الثاني الثانوي</option>
+					<option value="3HIGH">الثالث الثانوي</option>
+				</select>
+				<select
+					aria-label="تصفية حسب النوع"
+					value={testTypeFilter}
+					onChange={(event) => setTestTypeFilter(event.target.value)}
+				>
+					<option value="">كل الأنواع</option>
+					<option value="MCQ">اختيار من متعدد</option>
+					<option value="BUBBLE_SHEET">بابل إلكتروني</option>
+					<option value="PHYSICAL_SHEET">بابل حقيقي</option>
+				</select>
+				<button
+					className="test-filter-reset"
+					onClick={clearTestFilters}
+					type="button"
+				>
+					<span className="material-symbols-outlined">filter_alt_off</span>
+					مسح
+				</button>
+			</div>
+			<div className="test-library-summary">
+				<span>
+					<strong>{filteredTests.length}</strong> اختبار ظاهر
+				</span>
+				{showFinished ? (
+					<span className="test-library-summary__mode">
+						يشمل الاختبارات المنتهية
+					</span>
+				) : (
+					<span className="test-library-summary__mode">
+						الاختبارات المنتهية مخفية تلقائياً
+					</span>
+				)}
+			</div>
+
 			{/* Tests Grid */}
 			<div className="tests-grid">
-				{tests.length === 0 ? (
+				{filteredTests.length === 0 ? (
 					<div className="no-tests">
-						<p>لا توجد اختبارات</p>
+						<span className="material-symbols-outlined">search_off</span>
+						<p>
+							{tests.length === 0
+								? "لا توجد اختبارات"
+								: "لا توجد اختبارات مطابقة للفلاتر الحالية"}
+						</p>
+						{tests.length > 0 ? (
+							<button
+								className="test-filter-reset"
+								onClick={clearTestFilters}
+								type="button"
+							>
+								إظهار كل الاختبارات
+							</button>
+						) : null}
 					</div>
 				) : (
-					tests.map((test) => (
-						<div key={test.id} className="test-card">
+					filteredTests.map((test) => (
+						<div
+							key={test.id}
+							className={`test-card ${isFinishedTest(test) ? "is-finished" : ""}`}
+						>
 							<div className="test-header">
 								<h3>{test.title}</h3>
 								<span className="test-type">

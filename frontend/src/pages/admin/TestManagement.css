@@ -1620,3 +1620,459 @@
 		padding: 8px;
 	}
 }
+
+/* ── Search, filters, and horizontal assessment cards ── */
+
+.test-library-toolbar {
+	display: grid;
+	grid-template-columns: minmax(260px, 1.6fr) auto minmax(145px, 0.7fr) minmax(
+			145px,
+			0.7fr
+		) auto;
+	align-items: center;
+	gap: 9px;
+	max-width: 1440px;
+	margin: 0 auto 10px;
+	padding: 10px;
+	border: 1px solid rgba(186, 203, 185, 0.65);
+	border-radius: 18px;
+	background: rgba(255, 255, 255, 0.68);
+	box-shadow: 0 8px 25px rgba(0, 109, 53, 0.06);
+	backdrop-filter: blur(18px);
+}
+
+.test-library-search {
+	position: relative;
+	display: flex;
+	align-items: center;
+}
+
+.test-library-search svg {
+	position: absolute;
+	right: 14px;
+	z-index: 1;
+	color: #719079;
+	font-size: 0.9rem;
+}
+
+.test-library-search input,
+.test-library-toolbar > select {
+	width: 100%;
+	min-height: 43px;
+	padding: 0 39px 0 12px;
+	border: 1px solid #cfe1d2;
+	border-radius: 11px;
+	outline: 0;
+	background: #fbfffc;
+	color: #10271b;
+	font-family: inherit;
+	font-size: 0.8rem;
+}
+
+.test-library-toolbar > select {
+	padding-inline: 11px;
+}
+
+.test-library-search input:focus,
+.test-library-toolbar > select:focus {
+	border-color: #00a952;
+	box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.13);
+}
+
+.test-finished-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	min-height: 43px;
+	padding-inline: 5px;
+	color: #41604a;
+	font-size: 0.77rem;
+	font-weight: 800;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.test-finished-toggle input {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.test-finished-toggle__track {
+	display: inline-flex;
+	align-items: center;
+	width: 36px;
+	height: 20px;
+	padding: 2px;
+	border-radius: 999px;
+	background: #cbdacc;
+	transition: background 0.2s ease;
+}
+
+.test-finished-toggle__track span {
+	display: block;
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	background: white;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+	transition: transform 0.2s ease;
+}
+
+.test-finished-toggle input:checked + .test-finished-toggle__track {
+	background: #006d35;
+}
+
+.test-finished-toggle input:checked + .test-finished-toggle__track span {
+	transform: translateX(-16px);
+}
+
+.test-filter-reset {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 5px;
+	min-height: 40px;
+	padding: 0 12px;
+	border: 1px solid #cfe1d2;
+	border-radius: 10px;
+	background: #f6fcf7;
+	color: #006d35;
+	font-family: inherit;
+	font-size: 0.76rem;
+	font-weight: 800;
+	cursor: pointer;
+}
+
+.test-filter-reset:hover {
+	border-color: #006d35;
+	background: #eaf7ed;
+}
+.test-filter-reset .material-symbols-outlined {
+	font-size: 17px;
+}
+
+.test-library-summary {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	max-width: 1440px;
+	margin: 0 auto 14px;
+	padding-inline: 4px;
+	color: #65776b;
+	font-size: 0.78rem;
+	font-weight: 700;
+}
+
+.test-library-summary strong {
+	color: #006d35;
+	font-size: 1rem;
+}
+.test-library-summary__mode {
+	color: #8b5b00;
+}
+
+.no-tests .material-symbols-outlined {
+	color: #006d35;
+	font-size: 44px;
+}
+.no-tests .test-filter-reset {
+	margin-top: 8px;
+}
+
+@media (min-width: 900px) {
+	.test-card {
+		display: grid;
+		grid-template-columns: minmax(205px, 0.95fr) minmax(250px, 1.25fr) minmax(
+				150px,
+				0.65fr
+			);
+		grid-template-areas:
+			"header details actions"
+			"header countdown actions"
+			"header stats actions"
+			"header controls actions";
+		align-items: center;
+		gap: 0 22px;
+		min-height: 245px;
+	}
+
+	.test-header {
+		grid-area: header;
+		display: flex;
+		align-self: stretch;
+		justify-content: center;
+		margin: 0;
+		padding-inline-end: 20px;
+		border-inline-end: 1px solid #edf3ed;
+	}
+
+	.test-header h3 {
+		width: 100%;
+		font-size: 1.25rem;
+	}
+	.test-type {
+		align-self: flex-start;
+		margin-top: 10px;
+	}
+	.test-details {
+		grid-area: details;
+		align-self: end;
+		margin: 0;
+	}
+	.test-countdown {
+		grid-area: countdown;
+		width: 100%;
+		margin: 12px 0 0;
+	}
+	.test-stats {
+		grid-area: stats;
+		width: 100%;
+		margin: 12px 0 0;
+	}
+	.test-controls {
+		grid-area: controls;
+		width: 100%;
+		margin: 12px 0 0;
+	}
+	.test-actions {
+		grid-area: actions;
+		display: flex;
+		align-self: stretch;
+		flex-direction: column;
+		justify-content: center;
+		margin-inline-start: 0;
+		padding-inline-start: 4px;
+	}
+	.test-actions button {
+		width: 100%;
+		flex: 0 0 auto;
+	}
+}
+
+.test-card.is-finished {
+	border-color: #e5d9d4;
+}
+.test-card.is-finished::before {
+	background: #b4aaa5;
+}
+
+/* ── Modern themed test modals ── */
+
+.test-management .modal-overlay {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 18px;
+	background: rgba(9, 29, 18, 0.58);
+	backdrop-filter: blur(9px);
+}
+
+.test-management .modal-content {
+	width: min(100%, 900px);
+	max-height: calc(100vh - 36px);
+	overflow-y: auto;
+	border: 1px solid rgba(255, 255, 255, 0.72);
+	border-radius: 22px;
+	background: #fbfffc;
+	box-shadow: 0 30px 80px rgba(0, 0, 0, 0.24);
+}
+
+.test-management .test-modal {
+	width: min(100%, 940px);
+}
+.test-management .submissions-modal {
+	width: min(100%, 820px);
+}
+.test-management .modal-header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 18px;
+	padding: 24px 27px;
+	border-bottom: 1px solid #edf3ed;
+	background: linear-gradient(110deg, #e3f8e9, #fbfffc);
+}
+.test-management .modal-header h2 {
+	margin: 0;
+	color: #10271b;
+	font-size: 1.45rem;
+	font-weight: 800;
+}
+.test-management .close-btn {
+	display: grid;
+	width: 34px;
+	height: 34px;
+	place-items: center;
+	padding: 0;
+	border: 1px solid #cfe1d2;
+	border-radius: 10px;
+	background: white;
+	color: #55705d;
+	font-size: 24px;
+	cursor: pointer;
+}
+.test-management .close-btn:hover {
+	border-color: #8bc79a;
+	background: #eaf7ed;
+	color: #006d35;
+}
+.test-management .test-form {
+	padding: 26px 27px 30px;
+}
+.test-management .form-grid {
+	gap: 15px;
+	margin-bottom: 26px;
+}
+.test-management .form-group label {
+	margin-bottom: 7px;
+	color: #31543c;
+	font-size: 0.82rem;
+	font-weight: 800;
+}
+.test-management .form-group input,
+.test-management .form-group select,
+.test-management .form-group textarea {
+	border: 1px solid #cfe1d2;
+	border-radius: 11px;
+	outline: 0;
+	background: #fff;
+	color: #10271b;
+	font-family: inherit;
+}
+.test-management .form-group input:focus,
+.test-management .form-group select:focus,
+.test-management .form-group textarea:focus {
+	border-color: #00a952;
+	box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.13);
+}
+.test-management .section-header {
+	margin-bottom: 15px;
+	padding-bottom: 12px;
+	border-bottom-color: #edf3ed;
+}
+.test-management .section-header h3,
+.test-management .bubble-answers-section h3 {
+	color: #10271b;
+	font-size: 1.1rem;
+}
+.test-management .question-form {
+	border: 1px solid #d9e9dc;
+	border-radius: 15px;
+	background: #f5fbf6;
+}
+.test-management .question-header h4 {
+	color: #31543c;
+}
+.test-management .btn-danger-small {
+	border-radius: 8px;
+	background: #ffe8e1;
+	color: #b02f00;
+	font-family: inherit;
+	font-weight: 800;
+}
+.test-management .btn-danger-small:hover {
+	background: #ffd4c8;
+}
+.test-management .bubble-answers-grid {
+	border: 1px solid #e5eee6;
+	background: #f5fbf6;
+}
+.test-management .form-actions {
+	gap: 10px;
+	padding-top: 18px;
+	border-top-color: #edf3ed;
+}
+.test-management .form-actions .btn-primary,
+.test-management .form-actions .btn-secondary {
+	min-height: 44px;
+	border-radius: 11px;
+	font-family: inherit;
+	font-weight: 800;
+}
+.test-management .form-actions .btn-primary {
+	background: #006d35;
+	border-color: #006d35;
+}
+.test-management .form-actions .btn-primary:hover {
+	background: #005226;
+	border-color: #005226;
+}
+.test-management .form-actions .btn-secondary {
+	background: #e9f0ea;
+	color: #41604a;
+}
+.test-management .submissions-list {
+	padding: 22px 27px;
+}
+.test-management .submission-item {
+	border: 1px solid #e0ece1;
+	border-radius: 14px;
+	background: #f7fcf8;
+}
+.test-management .submission-item .student-info h4 {
+	color: #10271b;
+}
+.test-management .submission-item .student-info p,
+.test-management .submission-item .submission-details p {
+	color: #65776b;
+}
+.test-management .grading-form {
+	border: 1px solid #b9d8bf;
+	border-radius: 15px;
+	background: #f5fbf6;
+}
+.test-management .image-viewer-modal .modal-content {
+	max-width: 760px;
+}
+.test-management .image-viewer-modal .modal-header {
+	background: #006d35;
+	color: white;
+}
+.test-management .image-viewer-modal .modal-title {
+	color: white;
+}
+
+@media (max-width: 900px) {
+	.test-library-toolbar {
+		grid-template-columns: minmax(200px, 1fr) auto;
+	}
+	.test-library-search {
+		grid-column: 1 / -1;
+	}
+	.test-finished-toggle {
+		justify-self: start;
+	}
+	.test-library-toolbar > select {
+		min-width: 0;
+	}
+}
+
+@media (max-width: 620px) {
+	.test-library-toolbar {
+		grid-template-columns: 1fr;
+	}
+	.test-finished-toggle {
+		justify-self: stretch;
+	}
+	.test-library-toolbar > select,
+	.test-filter-reset {
+		width: 100%;
+	}
+	.test-library-summary {
+		align-items: flex-start;
+		flex-direction: column;
+		gap: 3px;
+	}
+	.test-management .test-form,
+	.test-management .submissions-list {
+		padding: 20px 16px;
+	}
+	.test-management .modal-header {
+		padding: 20px 16px;
+	}
+	.test-management .form-grid {
+		grid-template-columns: 1fr;
+	}
+}

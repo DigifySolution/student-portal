@@ -183,3 +183,51 @@
 		grid-template-columns: 1fr;
 	}
 }
+
+/* Keep the card itself horizontal while preserving a stacked mobile layout. */
+@media (min-width: 700px) {
+	.student-card {
+		display: grid;
+		grid-template-columns: minmax(180px, 0.8fr) minmax(240px, 1.35fr);
+		align-items: center;
+		gap: 24px;
+		min-height: 156px;
+	}
+
+	.student-card-header {
+		align-self: stretch;
+		align-items: center;
+		margin: 0;
+		padding-inline-end: 22px;
+		border-inline-end: 1px solid #edf3ed;
+	}
+
+	.student-card-body {
+		align-self: center;
+		margin: 0;
+		padding: 0;
+		border-top: 0;
+	}
+}
+
+/* Menus open above the card layer instead of being clipped behind neighbors. */
+.student-card:has(.student-actions-dropdown) {
+	z-index: 60;
+}
+
+.student-card-actions-menu {
+	z-index: 80;
+}
+
+.student-actions-dropdown {
+	top: auto;
+	bottom: calc(100% + 8px);
+	z-index: 120;
+}
+
+@media (max-width: 699px) {
+	.student-actions-dropdown {
+		top: calc(100% + 7px);
+		bottom: auto;
+	}
+}
