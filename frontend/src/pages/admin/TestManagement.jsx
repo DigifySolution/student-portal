@@ -564,7 +564,7 @@ const TestManagement = () => {
 						{paginatedTests.map((test) => (
 							<div
 								key={test.id}
-								className={`test-card ${isFinishedTest(test) ? "is-finished" : ""}`}
+								className={`admin-test-card ${isFinishedTest(test) ? "is-finished" : ""}`}
 							>
 								{/* Col 1: Title & Type */}
 								<div className="test-col test-col-title">
